@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.1.13
+// @version      0.2
 // @description  This plugin add an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -37,6 +37,8 @@ var FightProgressBar = (function()
 	for (var i = 0; i < game.data.leeks.length; i++)
 	{
 		leeks[game.data.leeks[i].id] = {
+			"absoluteShield" : 0,
+			"relativeShield" : 0,
 			"active" : (game.data.leeks[i].type == 0)?true:false,
 			"life" : game.data.leeks[i].life,
 			"maxLife" : game.data.leeks[i].life,
@@ -45,11 +47,13 @@ var FightProgressBar = (function()
 			"agility" : game.data.leeks[i].agility,
 			"force" : game.data.leeks[i].force,
 			"cell" : game.data.leeks[i].cellPos,
-			"weapon" : undefined
+			"weapon" : undefined,
+			"effects"  : []
 		}
 	};
 
 	var actionStatus = [];
+	var effects = [];
 
 	$.each(game.data.actions, function(key, action)
 	{
@@ -125,12 +129,19 @@ var FightProgressBar = (function()
 				break;
 
 			case ACTION_ADD_WEAPON_EFFECT:
+				var img = ["1", "2", "3", "4", "5", "6", "7", "flamme", "9", "gaz_icon", "11", "12"][action[1] - 1];
+				leeks[action[4]].effects[action[2]] = {id: action[2], type: "weapon", target: action[4], action: action};
+				effects[action[2]] = {id: action[2], type: "weapon", target: action[4], action: action};
 				break;
 
 			case ACTION_ADD_CHIP_EFFECT:
+				leeks[action[4]].effects[action[2]] = {id: action[2], type: "chip", target: action[4], action: action};
+				effects[action[2]] = {id: action[2], type: "chip", target: action[4], action: action};
 				break;
 
 			case ACTION_REMOVE_EFFECT:
+				delete leeks[effects[action[1]].target].effects[action[1]];
+				delete effects[action[1]];
 				break;
 
 		}
@@ -152,12 +163,15 @@ var FightProgressBar = (function()
 	{
 		$("#actions .action").remove();
 		$("#logs .log").remove();
+		$("[id^=effect]").remove();
 		game.currentTurn = actionStatus[action].currentTurn;
 		game.turn = actionStatus[action].currentTurn;
 		game.currentPlayer = actionStatus[action].currentPlayer;
 		game.currentAction = action;
 		for (var i = 0; i < leeks.length; i++)
 		{
+			game.leeks[i].absoluteShield = actionStatus[action].leeks[i].absoluteShield;
+			game.leeks[i].relativeShield = actionStatus[action].leeks[i].relativeShield;
 			game.leeks[i].active = actionStatus[action].leeks[i].active;
 			game.leeks[i].life = actionStatus[action].leeks[i].life;
 			game.leeks[i].maxLife = actionStatus[action].leeks[i].maxLife;
@@ -207,8 +221,17 @@ var FightProgressBar = (function()
 				}
 			}
 
+			$.each(actionStatus[action].leeks[i].effects, function(key, effect)
+			{
+				if (effect)
+				{
+					game.addEffect(effect.action, effect.type);
+				}
+
+			});
+
 		}
-		
+
 		game.showCellTime = 0;
 		for (var c = 0; c < game.chips.length; ++c)
 		{
