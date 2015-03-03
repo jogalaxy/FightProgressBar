@@ -215,7 +215,7 @@ $(progressBar).click(function(e)
 	insideBar.style.width = (percentage * 100) + "%";
 });
 
-$(progressBar).mousemove(function(e)
+/*$(progressBar).mousemove(function(e)
 {
 	if(e.which == 1)
 	{
@@ -223,6 +223,14 @@ $(progressBar).mousemove(function(e)
 		goToAction(Math.round(percentage * game.actions.length));
 		insideBar.style.width = (percentage * 100) + "%";
 	}
+});*/
+
+$(progressBar).click(function(e)
+{
+	var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+	percentage = Math.max(Math.min(percentage, 1), 0);
+	goToAction(Math.round(percentage * game.actions.length));
+	insideBar.style.width = (percentage * 100) + "%";
 });
 
 progressBar.appendChild(insideBar);
