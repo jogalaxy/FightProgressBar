@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.3
+// @version      0.31
 // @description  This plugin add an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -185,6 +185,7 @@ var FightProgressBar = (function()
 			{
 				game.leeks[i].dead = false;
 				game.leeks[i].bubble = new Bubble();
+				$('#entity-info-'+game.leeks[i].id).removeClass('dead');
 			}
 			else
 			{
