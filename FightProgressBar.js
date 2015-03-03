@@ -60,11 +60,7 @@ $.each(game.data.actions, function(key, action)
 			break;
 
 		case ACTION_MOVE_TO:
-			var newCell = action[3].pop();
-			if (newCell !== undefined)
-				leeks[action[1]].cell = newCell;
-			else
-				leeks[action[1]].cell = action[2];
+			leeks[action[1]].cell = action[2];
 			break;
 
 		case ACTION_PM_LOST:
