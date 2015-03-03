@@ -153,6 +153,7 @@ function goToAction(action)
 			game.leeks[i].dead = true;
 			game.leeks[i].bubble = null;
 		}
+
 		if (actionStatus[action].leeks[i].weapon === undefined)
 		{
 			game.leeks[i].weapon = undefined;
@@ -163,6 +164,26 @@ function goToAction(action)
 		}
 		game.leeks[i].moveDelay = 0;
 		game.leeks[i].path = [];
+		game.leeks[i].draw();
+
+		if (!game.leeks[i].active)
+		{
+			if (game.leeks[i].drawID)
+			{
+				game.hud.removeEntityBlock(game.leeks[i]);
+				game.removeDrawableElement(game.leeks[i].drawID, game.leeks[i].y);
+				game.leeks[i].drawID = null;
+			}
+		}
+		else
+		{
+			if (game.leeks[i].drawID === null)
+			{
+				game.hud.addEntityBlock(game.leeks[i]);
+				game.leeks[i].drawID = game.addDrawableElement(game.leeks[i], game.leeks[i].y);
+			}
+		}
+
 	}
 	
 	game.showCellTime = 0;
