@@ -23,6 +23,7 @@ var leeks = [];
 for (var i = 0; i < game.data.leeks.length; i++)
 {
 	leeks[i] = {
+		"active" : (game.data.leeks[i].type == 0)?true:false,
 		"life" : game.data.leeks[i].life,
 		"maxLife" : game.data.leeks[i].life,
 		"pt" : game.data.leeks[i].pt,
@@ -104,14 +105,14 @@ $.each(game.data.actions, function(key, action)
 			}
 			break;
 
-		//case ACTION_SUMMONING:
-		//	break;
+		case ACTION_SUMMONING:
+			leeks[action[2]].active = true;
+			leeks[action[2]].cell = action[3];
+			break;
 
 		// Effets
 
 	}
-
-	//console.log(currentTurn, action);
 
 	actionStatus[key] = {
 		"currentTurn" : currentTurn,
@@ -134,6 +135,7 @@ function goToAction(action)
 	game.currentAction = action;
 	for (var i = 0; i < leeks.length; i++)
 	{
+		game.leeks[i].active = actionStatus[action].leeks[i].active;
 		game.leeks[i].life = actionStatus[action].leeks[i].life;
 		game.leeks[i].maxLife = actionStatus[action].leeks[i].maxLife;
 		game.leeks[i].pt = actionStatus[action].leeks[i].pt;
