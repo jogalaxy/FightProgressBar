@@ -110,7 +110,14 @@ $.each(game.data.actions, function(key, action)
 			leeks[action[2]].cell = action[3];
 			break;
 
-		// Effets
+		case ACTION_ADD_WEAPON_EFFECT:
+			break;
+
+		case ACTION_ADD_CHIP_EFFECT:
+			break;
+
+		case ACTION_REMOVE_EFFECT:
+			break;
 
 	}
 
@@ -214,16 +221,6 @@ $(progressBar).click(function(e)
 	goToAction(Math.round(percentage * game.actions.length));
 	insideBar.style.width = (percentage * 100) + "%";
 });
-
-/*$(progressBar).mousemove(function(e)
-{
-	if(e.which == 1)
-	{
-		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
-		goToAction(Math.round(percentage * game.actions.length));
-		insideBar.style.width = (percentage * 100) + "%";
-	}
-});*/
 
 $(progressBar).click(function(e)
 {
