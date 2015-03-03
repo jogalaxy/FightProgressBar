@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.1.1
+// @version      0.1.11
 // @description  This plugin add an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -164,7 +164,7 @@ var FightProgressBar = (function()
 			game.leeks[i].pt = actionStatus[action].leeks[i].pt;
 			game.leeks[i].pm = actionStatus[action].leeks[i].pm;
 			game.leeks[i].agility = actionStatus[action].leeks[i].agility;
-			game.leeks[i].force = actionStatus[action].leeks[i].force;
+			game.leeks[i].strength = actionStatus[action].leeks[i].strength;
 			game.leeks[i].setCell(actionStatus[action].leeks[i].cell);
 			if (game.leeks[i].life > 0)
 			{
