@@ -136,6 +136,8 @@ function clone(obj)
 
 function goToAction(action)
 {
+	$("#actions .action").remove();
+	$("#logs .log").remove();
 	game.currentTurn = actionStatus[action].currentTurn;
 	game.turn = actionStatus[action].currentTurn;
 	game.currentPlayer = actionStatus[action].currentPlayer;
