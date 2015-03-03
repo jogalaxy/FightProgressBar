@@ -177,7 +177,7 @@ function goToAction(action)
 
 		if (!game.leeks[i].active)
 		{
-			if (game.leeks[i].drawID)
+			if (game.leeks[i].drawID && game.drawableElements[game.leeks[i].y][game.leeks[i].drawID] !== undefined)
 			{
 				game.hud.removeEntityBlock(game.leeks[i]);
 				game.removeDrawableElement(game.leeks[i].drawID, game.leeks[i].y);
@@ -255,4 +255,3 @@ game.actionDone = function()
 	game.actionDelay = 6;
 	insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
 }
-
