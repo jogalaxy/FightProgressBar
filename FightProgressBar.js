@@ -207,30 +207,44 @@ function goToAction(action)
 	game.draw();
 }
 
+//Interface
 var container = document.getElementById("fight-info");
 var progressBar = document.createElement("DIV");
 var insideBar = document.createElement("DIV");
 insideBar.style.width = "0%";
 insideBar.style.height = "100%";
-insideBar.style.backgroundColor = "#00CC00";
+insideBar.style.backgroundColor = "#00BB00";
 progressBar.style.width = "100%";
-progressBar.style.height = "20px";
-progressBar.style.backgroundColor = "black";
+progressBar.style.height = "15px";
+progressBar.style.backgroundColor = "#d1d1d1";
 
-$(progressBar).click(function(e)
-{
-	var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
-	goToAction(Math.round(percentage * game.actions.length));
-	insideBar.style.width = (percentage * 100) + "%";
-});
+document.getElementById("fight").style.borderBottom = "0px none #000000";
+document.getElementById("bottom-part-wrapper").style.bottom = "0px";
 
-$(progressBar).click(function(e)
-{
-	var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
-	percentage = Math.max(Math.min(percentage, 1), 0);
-	goToAction(Math.round(percentage * game.actions.length));
-	insideBar.style.width = (percentage * 100) + "%";
-});
+$(progressBar).mousedown(function(e)
+						{
+							var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+							goToAction(Math.round(percentage * game.actions.length));
+							insideBar.style.width = (percentage * 100) + "%";
+                        });
+
+$(progressBar).mousemove(function(e)
+                        {
+                             if(e.which == 1)
+                             {
+                                 var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+                                 goToAction(Math.round(percentage * game.actions.length));
+                                 insideBar.style.width = (percentage * 100) + "%";
+                             }
+                        });
+$(progressBar).mouseenter(function()
+                         {
+                            insideBar.style.backgroundColor = "#00DD00";
+                         });
+$(progressBar).mouseleave(function()
+                         {
+							insideBar.style.backgroundColor = "#00BB00";
+                         });
 
 progressBar.appendChild(insideBar);
 $(container).prepend(progressBar);
