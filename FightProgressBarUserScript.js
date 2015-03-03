@@ -13,6 +13,8 @@
 var FightProgressBar = (function()
 {
 
+	// Armes du jeu
+
 	var WEAPONS = [
 		Pistol, // 1
 		MachineGun, // 2
@@ -29,8 +31,7 @@ var FightProgressBar = (function()
 		BLaser // 13
 	];
 
-	var currentTurn = 1;
-	var currentPlayer = 0;
+	// Liste des poireaux
 
 	var leeks = [];
 
@@ -52,8 +53,14 @@ var FightProgressBar = (function()
 		}
 	};
 
+	// Intialisation des variables
+
+	var currentTurn = 1;
+	var currentPlayer = 0;
 	var actionStatus = [];
 	var effects = [];
+
+	// On joue la match action par action
 
 	$.each(game.data.actions, function(key, action)
 	{
@@ -62,7 +69,6 @@ var FightProgressBar = (function()
 		switch (type)
 		{
 
-			// Actions
 			case ACTION_NEW_TURN:
 				currentTurn = action[1];
 				break;
@@ -72,8 +78,6 @@ var FightProgressBar = (function()
 				break;
 
 			case ACTION_END_TURN:
-				leeks[action[1]].pt = action[2];
-				leeks[action[1]].pm = action[3];
 				leeks[action[1]].tp = action[2];
 				leeks[action[1]].mp = action[3];
 				break;
@@ -146,6 +150,8 @@ var FightProgressBar = (function()
 
 		}
 
+		// On sauvegarde l'état après l'action
+
 		actionStatus[key] = {
 			"currentTurn" : currentTurn,
 			"currentPlayer" : currentPlayer,
@@ -154,10 +160,14 @@ var FightProgressBar = (function()
 
 	});
 
+	// Fonction pour cloner un objet
+
 	function clone(obj)
 	{
 		return JSON.parse(JSON.stringify(obj));
 	}
+
+	// Fonction pour aller de nouveau à une action précise
 
 	function goToAction(action)
 	{
@@ -246,6 +256,8 @@ var FightProgressBar = (function()
 		game.draw();
 	}
 
+	// Interface (by Charlesfire)
+
 	var container = document.getElementById("fight-info");
 	var progressBar = document.createElement("DIV");
 	var insideBar = document.createElement("DIV");
@@ -301,6 +313,8 @@ var FightProgressBar = (function()
 	}
 
 });
+
+// Lancement du UserScript
 
 var intervalFightProgressBar = setInterval(function()
 {
