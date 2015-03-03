@@ -22,7 +22,7 @@ var leeks = [];
 
 for (var i = 0; i < game.data.leeks.length; i++)
 {
-	leeks[i] = {
+	leeks[game.data.leeks[i].id] = {
 		"active" : (game.data.leeks[i].type == 0)?true:false,
 		"life" : game.data.leeks[i].life,
 		"maxLife" : game.data.leeks[i].life,
