@@ -226,7 +226,7 @@ var FightProgressBar = (function()
 			{
 				if (game.leeks[i].drawID === null && game.leeks[i].life)
 				{
-					game.hud.addEntityBlock(game.leeks[i]);
+					if (game.leeks[i].summon) game.hud.addEntityBlock(game.leeks[i]);
 					game.leeks[i].drawID = game.addDrawableElement(game.leeks[i], game.leeks[i].y);
 				}
 			}
