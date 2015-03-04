@@ -185,7 +185,7 @@ var FightProgressBar = (function()
 		return JSON.parse(JSON.stringify(obj));
 	}
 
-	// Fonction pour aller de nouveau à une action pr�cise
+	// Fonction pour aller de nouveau à une action précise
 
 	function goToAction(action)
 	{
