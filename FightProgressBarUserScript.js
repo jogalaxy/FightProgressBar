@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.4
+// @version      0.41
 // @description  This plugin add an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -279,9 +279,12 @@ var FightProgressBar = (function()
 	document.getElementById("fight").style.borderBottom = "0px none #000000";
 	document.getElementById("bottom-part-wrapper").style.bottom = "0px";
 
+	var isMouseDown = false;
+
 	$(progressBar).mousedown(function(e)
 	{
 		e.preventDefault();
+		isMouseDown = true;
 		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
@@ -289,9 +292,15 @@ var FightProgressBar = (function()
 		game.pause();
 	});
 
+	$(document).mouseup(function(e)
+	{
+		isMouseDown = false;
+	});
+
 	$(progressBar).mouseup(function(e)
 	{
 		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
 		insideBar.style.width = (percentage * 100) + "%";
 		game.resume();
@@ -307,7 +316,7 @@ var FightProgressBar = (function()
 		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
 		popup.style.top = (e.clientY - popup.offsetHeight - 5) + "px";
 
-		if(e.which == 1)
+		if(isMouseDown == 1)
 		{
 			goToAction(Math.round(percentage * game.actions.length));
 			insideBar.style.width = (percentage * 100) + "%";
