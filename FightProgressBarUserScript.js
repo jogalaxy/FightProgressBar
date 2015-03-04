@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.6
+// @version      0.6.1
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -297,7 +297,7 @@ var FightProgressBar = (function()
 	progressBar.style.backgroundColor = "#D1D1D1";
 	progressBar.style.position = "absolute";
 	progressBar.style.bottom = "0px";
-	progressBar.style.zIndex = "999";
+	progressBar.style.zIndex = 998;
 
 	document.getElementById("fight").style.borderBottom = "0px none #000000";
 	document.getElementById("bottom-part-wrapper").style.bottom = "15px";
