@@ -4,7 +4,7 @@
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @version      0.53
-// @description  This plugin add an awesome progress bar to the fight viewer.
+// @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
 // @grant        none
@@ -160,7 +160,7 @@ var FightProgressBar = (function()
 
 		}
 
-		// On sauvegarde l'�tat apr�s l'action
+		// On sauvegarde l'état après l'action
 
 		actionStatus[key] = {
 			"currentTurn" : currentTurn,
@@ -177,7 +177,7 @@ var FightProgressBar = (function()
 		return JSON.parse(JSON.stringify(obj));
 	}
 
-	// Fonction pour aller de nouveau � une action pr�cise
+	// Fonction pour aller de nouveau à une action pr�cise
 
 	function goToAction(action)
 	{
