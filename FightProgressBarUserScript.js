@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.7
+// @version      0.8
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -56,7 +56,7 @@ var FightProgressBar = (function()
 		game.leeks[i].drawNormal1 = game.leeks[i].drawNormal;
 		game.leeks[i].drawNormal = function()
 		{
-			if (this.dead) this.deadAnim = Math.max(0, this.deadAnim);
+			if (this.dead) this.deadAnim = Math.max(1, this.deadAnim);
 			this.drawNormal1();
 		}
 	};
@@ -285,7 +285,7 @@ var FightProgressBar = (function()
 		game.draw();
 	}
 
-	// Interface (by Charlesfire)
+	// Interface
 
 	var popup = document.createElement("DIV");
 	var container = document.getElementById("hud");
@@ -388,6 +388,100 @@ var FightProgressBar = (function()
 	game.hud.leaveFullscreen = function() {
 		$('#top-part-wrapper').css('top', -8);
 	}
+
+	$('#top-part-wrapper').css('margin-left', -100);
+	$('#top-part-wrapper').css('width', 200);
+	$('#top-part').prepend('<img class="top-part-action" id="previous-player" src="http://leekwars.com/static/image/icon_play.png" style="transform: rotate(180deg); width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
+	$('#top-part').prepend('<img class="top-part-action" id="previous-turn" src="http://leekwars.com/static/image/icon_speed.png" style="transform: rotate(180deg); width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
+	$('#top-part').append('<img class="top-part-action" id="next-player" src="http://leekwars.com/static/image/icon_play.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
+	$('#top-part').append('<img class="top-part-action" id="next-turn" src="http://leekwars.com/static/image/icon_speed.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
+	
+	$('.top-part-action').mouseenter(function()
+	{
+		popup.style.display = "block";
+	});
+
+	$('.top-part-action').mouseleave(function()
+	{
+		popup.style.display = "none";
+	});
+
+	$('.top-part-action').mousemove(function(e)
+	{
+		e.preventDefault();
+		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
+		popup.style.top = (e.clientY + popup.offsetHeight - 5) + "px";
+		if (e.target.id == "previous-turn") popup.innerHTML = "Tour précédent";
+		if (e.target.id == "previous-player") popup.innerHTML = "Joueur précédent";
+		if (e.target.id == "next-turn") popup.innerHTML = "Tour suivant";
+		if (e.target.id == "next-player") popup.innerHTML = "Joueur suivant";
+	});
+
+	$('#previous-turn').click(function()
+	{
+		if (game.turn <= 2)
+		{
+			goToAction(0);
+		}
+		else
+		{
+			var previousTurn = game.turn - 1;
+			for (var i = game.currentAction; i >= 0; i--)
+			{
+				if (actionStatus[i].currentTurn == previousTurn - 1)
+				{
+					goToAction(i+1);
+					break;
+				}
+			}
+		}
+		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+	});
+
+	$('#next-turn').click(function()
+	{
+		var nextTurn = game.turn + 1;
+		for (var i = game.currentAction; i < actionStatus.length; i++)
+		{
+			if (actionStatus[i].currentTurn == nextTurn)
+			{
+				goToAction(i);
+				break;
+			}
+		}
+		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+	});
+
+	$('#previous-player').click(function()
+	{
+		var previousPlayer = undefined;
+		for (var i = game.currentAction; i >= 0; i--)
+		{
+			if (previousPlayer !== undefined && actionStatus[i].currentPlayer != previousPlayer)
+			{
+				goToAction(i+1);
+				break;
+			}
+			if (actionStatus[i].currentPlayer != game.currentPlayer)
+			{
+				previousPlayer = actionStatus[i].currentPlayer;
+			}
+		}
+		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+	});
+
+	$('#next-player').click(function()
+	{
+		for (var i = game.currentAction; i < actionStatus.length; i++)
+		{
+			if (actionStatus[i].currentPlayer != game.currentPlayer)
+			{
+				goToAction(i);
+				break;
+			}
+		}
+		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+	});
 
 });
 
