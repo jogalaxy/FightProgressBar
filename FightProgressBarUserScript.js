@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.53
+// @version      0.6
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -279,7 +279,7 @@ var FightProgressBar = (function()
 	// Interface (by Charlesfire)
 
 	var popup = document.createElement("DIV");
-	var container = document.getElementById("fight-info");
+	var container = document.getElementById("hud");
 	var progressBar = document.createElement("DIV");
 	var insideBar = document.createElement("DIV");
 	popup.style.position = "fixed";
@@ -295,9 +295,14 @@ var FightProgressBar = (function()
 	progressBar.style.width = "100%";
 	progressBar.style.height = "15px";
 	progressBar.style.backgroundColor = "#D1D1D1";
+	progressBar.style.position = "absolute";
+	progressBar.style.bottom = "0px";
+	progressBar.style.zIndex = "999";
 
 	document.getElementById("fight").style.borderBottom = "0px none #000000";
-	document.getElementById("bottom-part-wrapper").style.bottom = "0px";
+	document.getElementById("bottom-part-wrapper").style.bottom = "15px";
+	document.getElementById("actions-wrapper").style.bottom = "15px";
+	document.getElementById("logs-wrapper").style.bottom = "15px";
 
 	var isMouseDown = false;
 
@@ -364,6 +369,15 @@ var FightProgressBar = (function()
 		game.actionToDo = true;
 		game.actionDelay = 6;
 		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+	}
+
+	game.hud.enterFullscreen = function()
+	{
+		$('#top-part-wrapper').css('top', 0);
+	}
+
+	game.hud.leaveFullscreen = function() {
+		$('#top-part-wrapper').css('top', -8);
 	}
 
 });
