@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.1
+// @version      0.8.2
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -345,14 +345,15 @@ var FightProgressBar = (function()
 		e.preventDefault();
 		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
+        var action = Math.round(percentage * game.actions.length);
 
-		popup.innerHTML = "Tour " + actionStatus[Math.round(percentage * game.actions.length)].currentTurn;
+		popup.innerHTML = "Tour " + actionStatus[action].currentTurn + "<br/>Action " + action;
 		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
 		popup.style.top = (e.clientY - popup.offsetHeight - 5) + "px";
 
 		if(isMouseDown == 1)
 		{
-			goToAction(Math.round(percentage * game.actions.length));
+			goToAction(action);
 			insideBar.style.width = (percentage * 100) + "%";
 		}
 	});
