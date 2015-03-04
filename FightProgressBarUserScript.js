@@ -121,7 +121,7 @@ var FightProgressBar = (function()
 					leeks[action[5][0]].cell = leeks[action[1]].cell;
 					leeks[action[1]].cell = action[2];
 				}
-				if (action[3] == 37) // Téléportation
+				if (action[3] == 37) // T�l�portation
 				{
 					leeks[action[1]].cell = action[2];
 				}
@@ -150,7 +150,7 @@ var FightProgressBar = (function()
 
 		}
 
-		// On sauvegarde l'état après l'action
+		// On sauvegarde l'�tat apr�s l'action
 
 		actionStatus[key] = {
 			"currentTurn" : currentTurn,
@@ -167,7 +167,7 @@ var FightProgressBar = (function()
 		return JSON.parse(JSON.stringify(obj));
 	}
 
-	// Fonction pour aller de nouveau à une action précise
+	// Fonction pour aller de nouveau � une action pr�cise
 
 	function goToAction(action)
 	{
@@ -258,15 +258,23 @@ var FightProgressBar = (function()
 
 	// Interface (by Charlesfire)
 
+	var popup = document.createElement("DIV");
 	var container = document.getElementById("fight-info");
 	var progressBar = document.createElement("DIV");
 	var insideBar = document.createElement("DIV");
+	popup.style.position = "fixed";
+	popup.style.display = "none";
+	popup.style.border = "4px solid #BBBBBB";
+	popup.style.borderRadius = "2px";
+	popup.style.backgroundColor = "#BBBBBB";
+	popup.style.boxShadow = "4px 4px 2px rgba(0, 0, 0, 0.3)";
+	popup.style.zIndex = 999;
 	insideBar.style.width = "0%";
 	insideBar.style.height = "100%";
 	insideBar.style.backgroundColor = "#00BB00";
 	progressBar.style.width = "100%";
 	progressBar.style.height = "15px";
-	progressBar.style.backgroundColor = "#d1d1d1";
+	progressBar.style.backgroundColor = "#D1D1D1";
 
 	document.getElementById("fight").style.borderBottom = "0px none #000000";
 	document.getElementById("bottom-part-wrapper").style.bottom = "0px";
@@ -278,15 +286,29 @@ var FightProgressBar = (function()
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
 		insideBar.style.width = (percentage * 100) + "%";
+		game.pause();
+	});
+
+	$(progressBar).mouseup(function(e)
+	{
+		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+		goToAction(Math.round(percentage * game.actions.length));
+		insideBar.style.width = (percentage * 100) + "%";
+		game.resume();
 	});
 
 	$(progressBar).mousemove(function(e)
 	{
 		e.preventDefault();
+		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+		percentage = Math.max(Math.min(percentage, 1), 0);
+
+		popup.innerHTML = "Tour " + actionStatus[Math.round(percentage * game.actions.length)].currentTurn;
+		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
+		popup.style.top = (e.clientY - popup.offsetHeight - 5) + "px";
+
 		if(e.which == 1)
 		{
-			var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
-			percentage = Math.max(Math.min(percentage, 1), 0);
 			goToAction(Math.round(percentage * game.actions.length));
 			insideBar.style.width = (percentage * 100) + "%";
 		}
@@ -295,15 +317,18 @@ var FightProgressBar = (function()
 	$(progressBar).mouseenter(function()
 	{
 		insideBar.style.backgroundColor = "#00DD00";
+		popup.style.display = "block";
 	});
 
 	$(progressBar).mouseleave(function()
 	{
 		insideBar.style.backgroundColor = "#00BB00";
+		popup.style.display = "none";
 	});
 
-    progressBar.appendChild(insideBar);
-    $(container).prepend(progressBar);
+	document.body.appendChild(popup);
+	progressBar.appendChild(insideBar);
+	$(container).prepend(progressBar);
 
 	game.actionDone = function()
 	{
