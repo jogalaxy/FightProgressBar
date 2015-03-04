@@ -3,7 +3,7 @@
 // @namespace    FightProgressBar
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.41
+// @version      0.5
 // @description  This plugin add an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -200,6 +200,7 @@ var FightProgressBar = (function()
 			else
 			{
 				game.leeks[i].dead = true;
+				game.leeks[i].deadAnim = 0;
 				game.leeks[i].bubble = null;
 			}
 
@@ -211,10 +212,7 @@ var FightProgressBar = (function()
 			{
 				game.leeks[i].weapon = new WEAPONS[actionStatus[action].leeks[i].weapon - 1]();
 			}
-			game.leeks[i].moveDelay = 0;
-			game.leeks[i].path = [];
-			game.leeks[i].draw();
-
+			
 			if (!game.leeks[i].active)
 			{
 				if (game.leeks[i].drawID)
@@ -226,10 +224,20 @@ var FightProgressBar = (function()
 			}
 			else
 			{
-				if (game.leeks[i].drawID === null)
+				if (game.leeks[i].drawID === null && game.leeks[i].life)
 				{
 					game.hud.addEntityBlock(game.leeks[i]);
 					game.leeks[i].drawID = game.addDrawableElement(game.leeks[i], game.leeks[i].y);
+				}
+			}
+
+			if (game.leeks[i].dead)
+			{
+				if (game.leeks[i].drawID)
+				{
+					if (game.leeks[i].summon) game.hud.removeEntityBlock(game.leeks[i]);
+					game.removeDrawableElement(game.leeks[i].drawID, game.leeks[i].y);
+					game.leeks[i].drawID = null;
 				}
 			}
 
@@ -242,6 +250,8 @@ var FightProgressBar = (function()
 
 			});
 
+			game.leeks[i].moveDelay = 0;
+			game.leeks[i].path = [];
 		}
 
 		game.showCellTime = 0;
