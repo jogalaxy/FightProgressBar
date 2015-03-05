@@ -8,10 +8,6 @@
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
 // @grant        none
-// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.min.js
-// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.layout.min.js
-// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.js
-// @resource	 rickshaw_css https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.css
 // ==/UserScript==
 
 var Fightcontainer = (function()
