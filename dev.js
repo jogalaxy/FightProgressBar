@@ -300,7 +300,6 @@ var Fightcontainer = (function()
 	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
 	var graphContainer = document.createElement("DIV");
-	var graphProgress = document.createElement("DIV");
 	
 	var series = [];
 	var data = [];
@@ -327,15 +326,6 @@ var Fightcontainer = (function()
 	graph.render();
 	
 	graphContainer.style.position = "relative";
-	graphProgress.style.position = "absolute";
-	graphProgress.style.right = 0;
-	graphProgress.style.top = 0;
-	graphProgress.style.backgroundColor = "#D1D1D1";
-	graphProgress.style.borderLeft = "1px solid rgba(0, 0, 0, 0.3)";
-	graphProgress.style.opacity = "0.5";
-	graphProgress.style.width = "100%";
-	graphProgress.style.height = "250px";
-	graphProgress.style.zIndex = 10;
 	
 	popup.style.position = "fixed";
 	popup.style.display = "none";
@@ -364,8 +354,16 @@ var Fightcontainer = (function()
 	container.appendChild(progressBar);
 	$(hud).prepend(container);
 	$(hud).prepend(popup);
-	graphContainer.appendChild(graphProgress);
 	$("#fight-info").prepend(graphContainer);
+
+	var graphProgress = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+	graphProgress.setAttributeNS(null, 'x', -1);
+	graphProgress.setAttributeNS(null, 'y', 0);
+	graphProgress.setAttributeNS(null, 'height', '100%');
+	graphProgress.setAttributeNS(null, 'width', '0');
+	graphProgress.setAttributeNS(null, 'fill', '#000000');
+	graphProgress.setAttributeNS(null, 'fill-opacity', 0.5);
+	graphContainer.children[0].appendChild(graphProgress);
 
 	var isMouseDown = false;
 
@@ -537,8 +535,9 @@ var Fightcontainer = (function()
 
 	function refreshHud()
 	{
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
-		graphProgress.style.width = (100 - (game.currentAction/game.actions.length * 100)) + "%";
+		var percent = game.currentAction/game.actions.length * 100;
+		progressBar.style.width = percent + "%";
+		graphProgress.setAttributeNS(null, 'width', percent + "%");
 	}
 
 	// Onload
