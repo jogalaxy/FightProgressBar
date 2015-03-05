@@ -7,12 +7,17 @@
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
-// @grant        GM_log
 // @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.min.js
 // @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.layout.min.js
 // @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.js
 // @resource	 rickshaw_css https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.css
+// @grant        GM_addStyle
+// @grant        GM_getResourceText
+// @grant        none
 // ==/UserScript==
+
+var rickshaw_css = GM_getResourceText("rickshaw_css");
+GM_addStyle(rickshaw_css);
 
 var Fightcontainer = (function()
 {
@@ -372,7 +377,7 @@ var Fightcontainer = (function()
 	$("#fight-info").prepend(graphContainer);
 
 	var graphProgress = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-	graphProgress.setAttributeNS(null, 'x', -1);
+	graphProgress.setAttributeNS(null, 'x', 0);
 	graphProgress.setAttributeNS(null, 'y', 0);
 	graphProgress.setAttributeNS(null, 'height', '100%');
 	graphProgress.setAttributeNS(null, 'width', '0');
