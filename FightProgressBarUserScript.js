@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Leek Wars Fight Progress Bar
 // @namespace    Fightcontainer
-// @downloadURL  https://raw.githubusercontent.com/jogalaxy/Fightcontainer/master/FightcontainerUserScript.js
-// @updateURL    https://raw.githubusercontent.com/jogalaxy/Fightcontainer/master/FightcontainerUserScript.js
-// @version      0.8.2
+// @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
+// @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
+// @version      0.8.3
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
