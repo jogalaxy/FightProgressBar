@@ -303,23 +303,10 @@ var Fightcontainer = (function()
 	
 	var series = [];
 	var data = [];
-	var color = "";
-	var modifier = 0;
+	var colors = ["#FF0000", "#0000FF", "#FF2222", "#2222FF", "#FF4444", "#4444FF", "#F6666", "#6666FF", "#FF8888", "#8888FF", "#FFAAAA", "#AAAAFF"];
 	for (var i = 0; i < game.leeks.length; i++)
 	{
 		data = [];
-		modifier = 255 - Math.round(i/game.leeks.length * 255);
-		if (game.leeks[i].team == 1)
-		{
-			color = "rbga(" + modifier + ", 0, 0, 0)";
-		}
-		else
-		{
-			color = "rbga(0, " + modifier + ", 0, 0)";
-		}
-		
-		GM_log(color);
-		
 		$.each(actionStatus, function(key, action)
 		{
 			if (action.type == ACTION_END_TURN)
@@ -327,7 +314,7 @@ var Fightcontainer = (function()
 				data.push({x: key, y: action.leeks[i].life});
 			}
 		});
-		series.push({color: color, data: data});
+		series.push({color: colors[i], data: data});
 	}
 	
 	var graph = new Rickshaw.Graph({
