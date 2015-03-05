@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.7
+// @version      0.8.8
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -489,6 +489,39 @@ var Fightcontainer = (function()
 		}
 		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
 	});
+
+	// Onload
+	var intervalInitialized = setInterval(function()
+	{
+		if (game.initialized)
+		{
+			clearInterval(intervalInitialized);
+			var hash = window.location.hash.substring(1).split("/");
+			if (hash.length >= 2)
+			{
+				var turn = hash[0];
+				var playerName = hash[1];
+				var startTurn = 0;
+				for (var i = 0; i < actionStatus.length; i++)
+				{
+					if (actionStatus[i].currentTurn == turn && startTurn == 0)
+						startTurn = i;
+					/*if (actionStatus[i].currentTurn == turn && game.leeks[actionStatus[i].currentPlayer].name == playerName)
+					{
+						startTurn = i-1;
+						break;
+					}*/
+				}
+				if (startTurn != 0)
+				{
+					goToAction(startTurn);
+					$("#actions .action").remove();
+					$("#logs .log").remove();
+					$("[id^=effect]").remove();
+				}
+			}
+		}
+	}, 100);
 
 });
 
