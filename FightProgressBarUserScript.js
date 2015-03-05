@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.6
+// @version      0.8.7
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -131,7 +131,7 @@ var Fightcontainer = (function()
 				{
 					if (action[3] == 39) // Inversion
 					{
-						if (action[5][0])
+						if (action[5].length > 0)
 						{
 							leeks[action[5][0]].cell = leeks[action[1]].cell;
 							leeks[action[1]].cell = action[2];
