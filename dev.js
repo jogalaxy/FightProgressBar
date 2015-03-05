@@ -376,7 +376,7 @@ var Fightcontainer = (function()
 		var percentage = ((e.clientX - $(container).offset().left)/container.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
-		progressBar.style.width = (percentage * 100) + "%";
+		refreshHud();
 		game.pause();
 	});
 
@@ -390,7 +390,7 @@ var Fightcontainer = (function()
 		var percentage = ((e.clientX - $(container).offset().left)/container.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
-		progressBar.style.width = (percentage * 100) + "%";
+		refreshHud();
 		game.resume();
 	});
 
@@ -408,7 +408,7 @@ var Fightcontainer = (function()
 		if(isMouseDown == 1)
 		{
 			goToAction(action);
-			progressBar.style.width = (percentage * 100) + "%";
+			refreshHud();
 		}
 	});
 
