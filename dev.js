@@ -313,6 +313,10 @@ var Fightcontainer = (function()
 			{
 				data.push({x: key, y: action.leeks[i].life});
 			}
+			else if (key == actionStatus.length - 1)
+			{
+				data.push({x: key, y: action.leeks[i].life});
+			}
 		});
 		series.push({color: colors[i], data: data});
 	}
