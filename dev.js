@@ -337,19 +337,17 @@ var Fightcontainer = (function()
 		if (!game.leeks[i].summon)
 		{
 			data = [];
+			var thisTurn = 0;
 			$.each(actionStatus, function(key, action)
 			{
-				if (key == 0)
-				{
-					data.push({x: 0, y: action.leeks[i].life});
-				}
-				if (action.type == ACTION_END_TURN)
+				if (action.currentTurn != thisTurn)
 				{
 					data.push({x: action.currentTurn, y: action.leeks[i].life});
+					thisTurn = action.currentTurn;
 				}
-				else if (key == actionStatus.length - 1)
+				if (key == actionStatus.length - 1)
 				{
-					data.push({x: action.currentTurn, y: action.leeks[i].life});
+					data.push({x: action.currentTurn + 0.9, y: action.leeks[i].life});
 				}
 			});
 			series.push({name: game.leeks[i].name, color: colors[i], data: data});
@@ -367,7 +365,7 @@ var Fightcontainer = (function()
 
 	var hoverDetail = new Rickshaw.Graph.HoverDetail({
 		graph: graph,
-		xFormatter: function(x) { return "Tour " + x },
+		xFormatter: function(x) { return (Math.floor(x) != x) ? "Fin" : "Tour " + x },
 		yFormatter: function(y) { return y + " pv" }
 	});
 	
