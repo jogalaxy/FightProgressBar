@@ -306,19 +306,22 @@ var Fightcontainer = (function()
 	var colors = ["#FF0000", "#0000FF", "#FF2222", "#2222FF", "#FF4444", "#4444FF", "#F6666", "#6666FF", "#FF8888", "#8888FF", "#FFAAAA", "#AAAAFF"];
 	for (var i = 0; i < game.leeks.length; i++)
 	{
-		data = [];
-		$.each(actionStatus, function(key, action)
+		if (!game.leeks[i].summon)
 		{
-			if (action.type == ACTION_END_TURN)
+			data = [];
+			$.each(actionStatus, function(key, action)
 			{
-				data.push({x: key, y: action.leeks[i].life});
-			}
-			else if (key == actionStatus.length - 1)
-			{
-				data.push({x: key, y: action.leeks[i].life});
-			}
-		});
-		series.push({color: colors[i], data: data});
+				if (action.type == ACTION_END_TURN)
+				{
+					data.push({x: action.currentTurn, y: action.leeks[i].life});
+				}
+				else if (key == actionStatus.length - 1)
+				{
+					data.push({x: action.currentTurn, y: action.leeks[i].life});
+				}
+			});
+			series.push({name: game.leeks[i].name, color: colors[i], data: data});
+		}
 	}
 	
 	var graph = new Rickshaw.Graph({
@@ -327,7 +330,15 @@ var Fightcontainer = (function()
 		renderer: "line",
 		series: series
 	});
+
 	graph.render();
+
+	var hoverDetail = new Rickshaw.Graph.HoverDetail({
+		graph: graph,
+		xFormatter: function(x) { return "Tour " + x },
+		yFormatter: function(y) { return Math.floor(y) + " pv" }
+	});
+	
 	
 	graphContainer.style.position = "relative";
 	
