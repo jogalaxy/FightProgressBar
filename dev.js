@@ -557,11 +557,7 @@ var Fightcontainer = (function()
 				{
 					if (actionStatus[i].currentTurn == turn && startTurn == 0)
 						startTurn = i;
-					/*if (actionStatus[i].currentTurn == turn && game.leeks[actionStatus[i].currentPlayer].name == playerName)
-					{
-						startTurn = i-1;
-						break;
-					}*/
+					
 				}
 				if (startTurn != 0)
 				{
