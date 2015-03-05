@@ -1,16 +1,20 @@
 // ==UserScript==
 // @name         Leek Wars Fight Progress Bar
-// @namespace    FightProgressBar
-// @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
+// @namespace    Fightcontainer
+// @downloadURL  https://raw.githubusercontent.com/jogalaxy/Fightcontainer/master/FightcontainerUserScript.js
+// @updateURL    https://raw.githubusercontent.com/jogalaxy/Fightcontainer/master/FightcontainerUserScript.js
 // @version      0.8.2
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
 // @grant        none
+// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.min.js
+// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.layout.min.js
+// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.js
+// @resource	 rickshaw_css https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.css
 // ==/UserScript==
 
-var FightProgressBar = (function()
+var Fightcontainer = (function()
 {
 
 	// Armes du jeu
@@ -286,11 +290,11 @@ var FightProgressBar = (function()
 	}
 
 	// Interface
-
+    
 	var popup = document.createElement("DIV");
-	var container = document.getElementById("hud");
+	var hud = document.getElementById("hud");
+	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
-	var insideBar = document.createElement("DIV");
 	popup.style.position = "fixed";
 	popup.style.display = "none";
 	popup.style.border = "4px solid #BBBBBB";
@@ -298,15 +302,15 @@ var FightProgressBar = (function()
 	popup.style.backgroundColor = "#BBBBBB";
 	popup.style.boxShadow = "4px 4px 2px rgba(0, 0, 0, 0.3)";
 	popup.style.zIndex = 999;
-	insideBar.style.width = "0%";
-	insideBar.style.height = "100%";
-	insideBar.style.backgroundColor = "#00BB00";
-	progressBar.style.width = "100%";
+	progressBar.style.width = "0%";
 	progressBar.style.height = "15px";
-	progressBar.style.backgroundColor = "#D1D1D1";
-	progressBar.style.position = "absolute";
-	progressBar.style.bottom = "0px";
-	progressBar.style.zIndex = 998;
+	progressBar.style.backgroundColor = "#00BB00";
+	progressBar.style.clear = "left";
+	container.style.width = "100%";
+	container.style.backgroundColor = "#D1D1D1";
+	container.style.position = "absolute";
+	container.style.bottom = "0px";
+	container.style.zIndex = 998;
 
 	document.getElementById("fight").style.borderBottom = "0px none #000000";
 	document.getElementById("bottom-part-wrapper").style.bottom = "15px";
@@ -315,14 +319,14 @@ var FightProgressBar = (function()
 
 	var isMouseDown = false;
 
-	$(progressBar).mousedown(function(e)
+	$(container).mousedown(function(e)
 	{
 		e.preventDefault();
 		isMouseDown = true;
-		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+		var percentage = ((e.clientX - $(container).offset().left)/container.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
-		insideBar.style.width = (percentage * 100) + "%";
+		progressBar.style.width = (percentage * 100) + "%";
 		game.pause();
 	});
 
@@ -331,19 +335,19 @@ var FightProgressBar = (function()
 		isMouseDown = false;
 	});
 
-	$(progressBar).mouseup(function(e)
+	$(container).mouseup(function(e)
 	{
-		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+		var percentage = ((e.clientX - $(container).offset().left)/container.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
-		insideBar.style.width = (percentage * 100) + "%";
+		progressBar.style.width = (percentage * 100) + "%";
 		game.resume();
 	});
 
-	$(progressBar).mousemove(function(e)
+	$(container).mousemove(function(e)
 	{
 		e.preventDefault();
-		var percentage = ((e.clientX - $(progressBar).offset().left)/progressBar.offsetWidth);
+		var percentage = ((e.clientX - $(container).offset().left)/container.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
         var action = Math.round(percentage * game.actions.length);
 
@@ -354,31 +358,31 @@ var FightProgressBar = (function()
 		if(isMouseDown == 1)
 		{
 			goToAction(action);
-			insideBar.style.width = (percentage * 100) + "%";
+			progressBar.style.width = (percentage * 100) + "%";
 		}
 	});
 
-	$(progressBar).mouseenter(function()
+	$(container).mouseenter(function()
 	{
-		insideBar.style.backgroundColor = "#00DD00";
+		progressBar.style.backgroundColor = "#00DD00";
 		popup.style.display = "block";
 	});
 
-	$(progressBar).mouseleave(function()
+	$(container).mouseleave(function()
 	{
-		insideBar.style.backgroundColor = "#00BB00";
+		progressBar.style.backgroundColor = "#00BB00";
 		popup.style.display = "none";
 	});
 
 	document.body.appendChild(popup);
-	progressBar.appendChild(insideBar);
-	$(container).prepend(progressBar);
+	container.appendChild(progressBar);
+	$(hud).prepend(container);
 
 	game.actionDone = function()
 	{
 		game.actionToDo = true;
 		game.actionDelay = 6;
-		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
 	}
 
 	game.hud.enterFullscreen = function()
@@ -436,7 +440,7 @@ var FightProgressBar = (function()
 				}
 			}
 		}
-		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
 	});
 
 	$('#next-turn').click(function()
@@ -450,7 +454,7 @@ var FightProgressBar = (function()
 				break;
 			}
 		}
-		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
 	});
 
 	$('#previous-player').click(function()
@@ -468,7 +472,7 @@ var FightProgressBar = (function()
 				previousPlayer = actionStatus[i].currentPlayer;
 			}
 		}
-		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
 	});
 
 	$('#next-player').click(function()
@@ -481,18 +485,18 @@ var FightProgressBar = (function()
 				break;
 			}
 		}
-		insideBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
 	});
 
 });
 
 // Lancement du UserScript
 
-var intervalFightProgressBar = setInterval(function()
+var intervalFightcontainer = setInterval(function()
 {
 	if (game.inited)
 	{
-		clearInterval(intervalFightProgressBar);
-		FightProgressBar();
+		clearInterval(intervalFightcontainer);
+		Fightcontainer();
 	}
 }, 100);
