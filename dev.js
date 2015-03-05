@@ -298,6 +298,29 @@ var Fightcontainer = (function()
 		game.draw();
 	}
 
+	function goToActionFromTurnAndPlayer(turn, playerName)
+	{
+		var startTurn = 0;
+		for (var i = 0; i < actionStatus.length; i++)
+		{
+			if (actionStatus[i].currentTurn == turn && startTurn == 0)
+				startTurn = i;
+			/*if (actionStatus[i].currentTurn == turn && game.leeks[actionStatus[i].currentPlayer].name == playerName)
+			{
+				startTurn = i-1;
+				break;
+			}*/
+		}
+		if (startTurn != 0)
+		{
+			goToAction(startTurn);
+			$("#actions .action").remove();
+			$("#logs .log").remove();
+			$("[id^=effect]").remove();
+		}
+		refreshHud();
+	}
+
 	// Interface
     
 	var popup = document.createElement("DIV");
@@ -316,6 +339,10 @@ var Fightcontainer = (function()
 			data = [];
 			$.each(actionStatus, function(key, action)
 			{
+				if (key == 0)
+				{
+					data.push({x: 0, y: action.leeks[i].life});
+				}
 				if (action.type == ACTION_END_TURN)
 				{
 					data.push({x: action.currentTurn, y: action.leeks[i].life});
@@ -341,9 +368,21 @@ var Fightcontainer = (function()
 	var hoverDetail = new Rickshaw.Graph.HoverDetail({
 		graph: graph,
 		xFormatter: function(x) { return "Tour " + x },
-		yFormatter: function(y) { return Math.floor(y) + " pv" }
+		yFormatter: function(y) { return y + " pv" }
 	});
 	
+	$(graphContainer).click(function()
+	{
+		var turn = $(".rickshaw_graph .detail div.x_label").text();
+		var player = $(".rickshaw_graph .detail div.item.active").text();
+		turn = turn.split(" ");
+		player = player.split(":");
+		if (turn[1] !== undefined && player[1] !== undefined) {
+			playerName = player[0];
+			turn = turn[1];
+			goToActionFromTurnAndPlayer(turn, playerName);
+		}
+	});
 	
 	graphContainer.style.position = "relative";
 	
@@ -571,24 +610,7 @@ var Fightcontainer = (function()
 			{
 				var turn = hash[0];
 				var playerName = hash[1];
-				var startTurn = 0;
-				for (var i = 0; i < actionStatus.length; i++)
-				{
-					if (actionStatus[i].currentTurn == turn && startTurn == 0)
-						startTurn = i;
-					/*if (actionStatus[i].currentTurn == turn && game.leeks[actionStatus[i].currentPlayer].name == playerName)
-					{
-						startTurn = i-1;
-						break;
-					}*/
-				}
-				if (startTurn != 0)
-				{
-					goToAction(startTurn);
-					$("#actions .action").remove();
-					$("#logs .log").remove();
-					$("[id^=effect]").remove();
-				}
+				goToActionFromTurnAndPlayerName(turn, playerName);
 			}
 		}
 	}, 100);
