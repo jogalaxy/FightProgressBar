@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.12
+// @version      0.8.13
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -384,7 +384,7 @@ var Fightcontainer = (function()
 	{
 		game.actionToDo = true;
 		game.actionDelay = 6;
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	}
 
 	game.hud.enterFullscreen = function()
@@ -443,7 +443,7 @@ var Fightcontainer = (function()
 				}
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
 
 	$('#next-turn').click(function()
@@ -457,7 +457,7 @@ var Fightcontainer = (function()
 				break;
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
 
 	$('#previous-player').click(function()
@@ -475,7 +475,7 @@ var Fightcontainer = (function()
 				previousPlayer = actionStatus[i].currentPlayer;
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
 
 	$('#next-player').click(function()
@@ -488,8 +488,13 @@ var Fightcontainer = (function()
 				break;
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
+
+	function refreshHud()
+	{
+		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+	}
 
 	// Onload
 	var intervalInitialized = setInterval(function()
