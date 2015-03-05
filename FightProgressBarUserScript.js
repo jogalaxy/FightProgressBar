@@ -177,6 +177,7 @@ var Fightcontainer = (function()
 		// On sauvegarde l'état après l'action
 
 		actionStatus[key] = {
+			"type" : type,
 			"currentTurn" : currentTurn,
 			"currentPlayer" : currentPlayer,
 			"leeks" : clone(leeks)
@@ -297,6 +298,31 @@ var Fightcontainer = (function()
 	var hud = document.getElementById("hud");
 	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
+	var graphContainer = document.createElement("DIV");
+	
+	var series = [];
+	var data = [];
+	for (var i = 0; i < game.leeks.length; i++)
+	{
+		data = [];
+		$.each(actionStatus, function(key, action)
+		{
+			if (action.type == ACTION_END_TURN)
+			{
+				data.push({x: key, y: action.leeks[i].life});
+			}
+		});
+		series.push({color: "steelblue", data: data});
+	}
+	
+	var graph = new Rickshaw.Graph({
+		element: graphContainer,
+		width: parseInt(document.getElementById("fight-info").offsetWidth),
+		renderer: "line",
+		series: series
+	});
+	graph.render();
+	
 	popup.style.position = "fixed";
 	popup.style.display = "none";
 	popup.style.border = "4px solid #BBBBBB";
@@ -304,10 +330,12 @@ var Fightcontainer = (function()
 	popup.style.backgroundColor = "#BBBBBB";
 	popup.style.boxShadow = "4px 4px 2px rgba(0, 0, 0, 0.3)";
 	popup.style.zIndex = 999;
+	
 	progressBar.style.width = "0%";
 	progressBar.style.height = "15px";
 	progressBar.style.backgroundColor = "#00BB00";
 	progressBar.style.clear = "left";
+	
 	container.style.width = "100%";
 	container.style.backgroundColor = "#D1D1D1";
 	container.style.position = "absolute";
@@ -318,6 +346,11 @@ var Fightcontainer = (function()
 	document.getElementById("bottom-part-wrapper").style.bottom = "15px";
 	document.getElementById("actions-wrapper").style.bottom = "15px";
 	document.getElementById("logs-wrapper").style.bottom = "15px";
+	
+	container.appendChild(progressBar);
+	$(hud).prepend(container);
+	$(hud).prepend(popup);
+	$("#fight-info").prepend(graphContainer);
 
 	var isMouseDown = false;
 
@@ -376,10 +409,6 @@ var Fightcontainer = (function()
 		popup.style.display = "none";
 	});
 
-	container.appendChild(progressBar);
-	$(hud).prepend(container);
-	$(hud).prepend(popup);
-
 	game.actionDone = function()
 	{
 		game.actionToDo = true;
@@ -392,7 +421,8 @@ var Fightcontainer = (function()
 		$('#top-part-wrapper').css('top', 0);
 	}
 
-	game.hud.leaveFullscreen = function() {
+	game.hud.leaveFullscreen = function()
+	{
 		$('#top-part-wrapper').css('top', -8);
 	}
 
