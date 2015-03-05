@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.11
+// @version      0.8.12
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -298,30 +298,6 @@ var Fightcontainer = (function()
 	var hud = document.getElementById("hud");
 	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
-	var graphContainer = document.createElement("DIV");
-	
-	var series = [];
-	var data = [];
-	for (var i = 0; i < game.leeks.length; i++)
-	{
-		data = [];
-		$.each(actionStatus, function(key, action)
-		{
-			if (action.type == ACTION_END_TURN)
-			{
-				data.push({x: key, y: action.leeks[i].life});
-			}
-		});
-		series.push({color: "steelblue", data: data});
-	}
-	
-	var graph = new Rickshaw.Graph({
-		element: graphContainer,
-		width: parseInt(document.getElementById("fight-info").offsetWidth),
-		renderer: "line",
-		series: series
-	});
-	graph.render();
 	
 	popup.style.position = "fixed";
 	popup.style.display = "none";
@@ -350,7 +326,6 @@ var Fightcontainer = (function()
 	container.appendChild(progressBar);
 	$(hud).prepend(container);
 	$(hud).prepend(popup);
-	$("#fight-info").prepend(graphContainer);
 
 	var isMouseDown = false;
 
