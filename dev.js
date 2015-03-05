@@ -300,6 +300,7 @@ var Fightcontainer = (function()
 	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
 	var graphContainer = document.createElement("DIV");
+	var graphProgress = document.createElement("DIV");
 	
 	var series = [];
 	var data = [];
@@ -324,6 +325,16 @@ var Fightcontainer = (function()
 		series: series
 	});
 	graph.render();
+	
+	graphContainer.style.position = "relative";
+	graphProgress.style.position = "absolute";
+	graphProgress.style.right = 0;
+	graphProgress.style.top = 0;
+	graphProgress.style.backgroundColor = "#D1D1D1";
+	graphProgress.style.opacity = "0.7";
+	graphProgress.style.width = "100%";
+	graphProgress.style.height = "250px";
+	graphProgress.style.zIndex = 998;
 	
 	popup.style.position = "fixed";
 	popup.style.display = "none";
@@ -352,6 +363,7 @@ var Fightcontainer = (function()
 	container.appendChild(progressBar);
 	$(hud).prepend(container);
 	$(hud).prepend(popup);
+	graphContainer.appendChild(graphProgress);
 	$("#fight-info").prepend(graphContainer);
 
 	var isMouseDown = false;
