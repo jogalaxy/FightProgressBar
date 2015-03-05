@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.4
+// @version      0.8.5
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -373,9 +373,9 @@ var Fightcontainer = (function()
 		popup.style.display = "none";
 	});
 
-	document.body.appendChild(popup);
 	container.appendChild(progressBar);
 	$(hud).prepend(container);
+	$(hud).prepend(popup);
 
 	game.actionDone = function()
 	{
