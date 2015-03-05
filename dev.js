@@ -427,7 +427,7 @@ var Fightcontainer = (function()
 	{
 		game.actionToDo = true;
 		game.actionDelay = 6;
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	}
 
 	game.hud.enterFullscreen = function()
@@ -486,7 +486,7 @@ var Fightcontainer = (function()
 				}
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
 
 	$('#next-turn').click(function()
@@ -500,7 +500,7 @@ var Fightcontainer = (function()
 				break;
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
 
 	$('#previous-player').click(function()
@@ -518,7 +518,7 @@ var Fightcontainer = (function()
 				previousPlayer = actionStatus[i].currentPlayer;
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
 
 	$('#next-player').click(function()
@@ -531,8 +531,13 @@ var Fightcontainer = (function()
 				break;
 			}
 		}
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		refreshHud();
 	});
+
+	function refreshHud()
+	{
+		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+	}
 
 	// Onload
 	var intervalInitialized = setInterval(function()
