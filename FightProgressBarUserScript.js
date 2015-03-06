@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.9.1
+// @version      0.9.2
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -25,7 +25,7 @@ var Fightcontainer = (function()
 		Shotgun,  // 4
 		Magnum, // 5
 		Laser, // 6
-		GrenadeLauncher, // 7 
+		GrenadeLauncher, // 7
 		FlameThrower, // 8
 		Destroyer, // 9
 		Gazor, // 10
@@ -99,7 +99,7 @@ var Fightcontainer = (function()
 			case ACTION_PM_LOST:
 				leeks[action[1]].mp -= action[2];
 				break;
-					
+
 			case ACTION_CARE:
 				leeks[action[1]].life += action[2];
 				break;
@@ -108,7 +108,7 @@ var Fightcontainer = (function()
 				leeks[action[1]].life += action[2];
 				leeks[action[1]].maxLife += action[2];
 				break;
-			
+
 			case ACTION_SET_WEAPON:
 				leeks[action[1]].weapon = action[2];
 				break;
@@ -116,11 +116,11 @@ var Fightcontainer = (function()
 			case ACTION_LIFE_LOST:
 				leeks[action[1]].life -= action[2];
 				break;
-				
+
 			case ACTION_PT_LOST:
 				leeks[action[1]].tp -= action[2];
 				break;
-				
+
 			case ACTION_PLAYER_DEAD:
 				leeks[action[1]].life = 0;
 				break;
@@ -237,7 +237,7 @@ var Fightcontainer = (function()
 			{
 				game.leeks[i].weapon = new WEAPONS[actionStatus[action].leeks[i].weapon - 1]();
 			}
-			
+
 			if (!game.leeks[i].active)
 			{
 				if (game.leeks[i].drawID)
@@ -316,13 +316,79 @@ var Fightcontainer = (function()
 		refreshHud();
 	}
 
+	function goToPreviousTurn()
+	{
+		if (game.turn <= 2)
+		{
+			goToAction(0);
+		}
+		else
+		{
+			var previousTurn = game.turn - 1;
+			for (var i = game.currentAction; i >= 0; i--)
+			{
+				if (actionStatus[i].currentTurn == previousTurn - 1)
+				{
+					goToAction(i+1);
+					break;
+				}
+			}
+		}
+		refreshHud();
+	}
+
+	function goToNextTurn()
+	{
+		var nextTurn = game.turn + 1;
+		for (var i = game.currentAction; i < actionStatus.length; i++)
+		{
+			if (actionStatus[i].currentTurn == nextTurn)
+			{
+				goToAction(i);
+				break;
+			}
+		}
+		refreshHud();
+	}
+
+	function goToPreviousPlayer()
+	{
+		var previousPlayer = undefined;
+		for (var i = game.currentAction; i >= 0; i--)
+		{
+			if (previousPlayer !== undefined && actionStatus[i].currentPlayer != previousPlayer)
+			{
+				goToAction(i+1);
+				break;
+			}
+			if (actionStatus[i].currentPlayer != game.currentPlayer)
+			{
+				previousPlayer = actionStatus[i].currentPlayer;
+			}
+		}
+		refreshHud();
+	}
+
+	function goToNextPlayer()
+	{
+		for (var i = game.currentAction; i < actionStatus.length; i++)
+		{
+			if (actionStatus[i].currentPlayer != game.currentPlayer)
+			{
+				goToAction(i);
+				break;
+			}
+		}
+		refreshHud();
+	}
+
 	// Interface
-    
+
 	var popup = document.createElement("DIV");
 	var hud = document.getElementById("hud");
 	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
-	
+
 	popup.style.position = "fixed";
 	popup.style.display = "none";
 	popup.style.border = "4px solid #BBBBBB";
@@ -330,12 +396,12 @@ var Fightcontainer = (function()
 	popup.style.backgroundColor = "#BBBBBB";
 	popup.style.boxShadow = "4px 4px 2px rgba(0, 0, 0, 0.3)";
 	popup.style.zIndex = 999;
-	
+
 	progressBar.style.width = "0%";
 	progressBar.style.height = "15px";
 	progressBar.style.backgroundColor = "#00BB00";
 	progressBar.style.clear = "left";
-	
+
 	container.style.width = "100%";
 	container.style.backgroundColor = "#D1D1D1";
 	container.style.position = "absolute";
@@ -346,7 +412,7 @@ var Fightcontainer = (function()
 	document.getElementById("bottom-part-wrapper").style.bottom = "15px";
 	document.getElementById("actions-wrapper").style.bottom = "15px";
 	document.getElementById("logs-wrapper").style.bottom = "15px";
-	
+
 	container.appendChild(progressBar);
 	$(hud).prepend(container);
 	$(hud).prepend(popup);
@@ -431,7 +497,7 @@ var Fightcontainer = (function()
 	$('#top-part').prepend('<img class="top-part-action" id="previous-turn" src="http://leekwars.com/static/image/icon_speed.png" style="transform: rotate(180deg); width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part').append('<img class="top-part-action" id="next-player" src="http://leekwars.com/static/image/icon_play.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part').append('<img class="top-part-action" id="next-turn" src="http://leekwars.com/static/image/icon_speed.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
-	
+
 	$('.top-part-action').mouseenter(function()
 	{
 		popup.style.display = "block";
@@ -453,70 +519,39 @@ var Fightcontainer = (function()
 		if (e.target.id == "next-player") popup.innerHTML = "Joueur suivant";
 	});
 
-	$('#previous-turn').click(function()
-	{
-		if (game.turn <= 2)
-		{
-			goToAction(0);
-		}
-		else
-		{
-			var previousTurn = game.turn - 1;
-			for (var i = game.currentAction; i >= 0; i--)
-			{
-				if (actionStatus[i].currentTurn == previousTurn - 1)
-				{
-					goToAction(i+1);
-					break;
-				}
-			}
-		}
-		refreshHud();
-	});
+	$('#previous-turn').click(goToPreviousTurn);
 
-	$('#next-turn').click(function()
-	{
-		var nextTurn = game.turn + 1;
-		for (var i = game.currentAction; i < actionStatus.length; i++)
-		{
-			if (actionStatus[i].currentTurn == nextTurn)
-			{
-				goToAction(i);
-				break;
-			}
-		}
-		refreshHud();
-	});
+	$('#next-turn').click(goToNextTurn);
 
-	$('#previous-player').click(function()
-	{
-		var previousPlayer = undefined;
-		for (var i = game.currentAction; i >= 0; i--)
-		{
-			if (previousPlayer !== undefined && actionStatus[i].currentPlayer != previousPlayer)
-			{
-				goToAction(i+1);
-				break;
-			}
-			if (actionStatus[i].currentPlayer != game.currentPlayer)
-			{
-				previousPlayer = actionStatus[i].currentPlayer;
-			}
-		}
-		refreshHud();
-	});
+	$('#previous-player').click(goToPreviousPlayer);
 
-	$('#next-player').click(function()
+	$('#next-player').click(goToNextPlayer);
+
+	// Raccourcis clavier
+
+	$(document).keydown(function(event)
 	{
-		for (var i = game.currentAction; i < actionStatus.length; i++)
+		if ($("#comment-input").is(":focus")) return;
+
+		switch (event.key)
 		{
-			if (actionStatus[i].currentPlayer != game.currentPlayer)
-			{
-				goToAction(i);
+			case 'c':
+				goToPreviousTurn();
+				event.preventDefault();
 				break;
-			}
+			case 'v':
+				goToPreviousPlayer();
+				event.preventDefault();
+				break;
+			case 'b':
+				goToNextPlayer();
+				event.preventDefault();
+				break;
+			case 'n':
+				goToNextTurn();
+				event.preventDefault();
+				break;
 		}
-		refreshHud();
 	});
 
 	function refreshHud()
@@ -560,7 +595,7 @@ var Fightcontainer = (function()
 				series.push({name: game.leeks[i].name, color: colors[game.leeks[i].team], data: data});
 			}
 		}
-		
+
 		var graph = new Rickshaw.Graph({
 			element: graphContainer,
 			width: parseInt(document.getElementById("fight-info").offsetWidth),
@@ -593,7 +628,7 @@ var Fightcontainer = (function()
 				refreshHud();
 			}
 		});
-		
+
 		$(graphContainer).mousedown(function(e)
 		{
 			e.preventDefault();
@@ -604,7 +639,7 @@ var Fightcontainer = (function()
 			refreshHud();
 			game.pause();
 		});
-		
+
 		$(graphContainer).mouseup(function(e)
 		{
 			e.preventDefault();
