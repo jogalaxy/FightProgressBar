@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.14
+// @version      0.8.15
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -133,7 +133,7 @@ var Fightcontainer = (function()
 				break;
 
 			case ACTION_USE_CHIP:
-				if (action[4] == 0) // Pas d'échec
+				if (action[4] == 0) // Pas d'?chec
 				{
 					if (action[3] == 39) // Inversion
 					{
@@ -143,7 +143,7 @@ var Fightcontainer = (function()
 							leeks[action[1]].cell = action[2];
 						}
 					}
-					if (action[3] == 37) // Téléportation
+					if (action[3] == 37) // T?l?portation
 					{
 						leeks[action[1]].cell = action[2];
 					}
@@ -180,7 +180,7 @@ var Fightcontainer = (function()
 
 		}
 
-		// On sauvegarde l'état après l'action
+		// On sauvegarde l'?tat apr?s l'action
 
 		actionStatus[key] = {
 			"type" : type,
@@ -198,7 +198,7 @@ var Fightcontainer = (function()
 		return JSON.parse(JSON.stringify(obj));
 	}
 
-	// Fonction pour aller de nouveau à une action précise
+	// Fonction pour aller de nouveau ? une action pr?cise
 
 	function goToAction(action)
 	{
@@ -384,6 +384,44 @@ var Fightcontainer = (function()
 		}
 	});
 	
+	$(graphContainer).mousemove(function(e)
+	{
+		e.preventDefault();
+		var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+		percentage = Math.max(Math.min(percentage, 1), 0);
+        var action = Math.round(percentage * game.actions.length);
+
+		popup.innerHTML = "Tour " + actionStatus[action].currentTurn + "<br/>Action " + action;
+		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
+		popup.style.top = (e.clientY - popup.offsetHeight - 5) + "px";
+
+		if(isMouseDown == 1)
+		{
+			goToAction(action);
+			refreshHud();
+		}
+	});
+	
+	$(graphContainer).mousedown(function(e)
+	{
+		e.preventDefault();
+		isMouseDown = true;
+		var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+		percentage = Math.max(Math.min(percentage, 1), 0);
+		goToAction(Math.round(percentage * game.actions.length));
+		refreshHud();
+		game.pause();
+	});
+	
+	$(graphContainer).mouseup(function(e)
+	{
+		var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+		percentage = Math.max(Math.min(percentage, 1), 0);
+		goToAction(Math.round(percentage * game.actions.length));
+		refreshHud();
+		game.resume();
+	});
+	
 	graphContainer.style.position = "relative";
 	
 	popup.style.position = "fixed";
@@ -520,8 +558,8 @@ var Fightcontainer = (function()
 		e.preventDefault();
 		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
 		popup.style.top = (e.clientY + popup.offsetHeight - 5) + "px";
-		if (e.target.id == "previous-turn") popup.innerHTML = "Tour précédent";
-		if (e.target.id == "previous-player") popup.innerHTML = "Joueur précédent";
+		if (e.target.id == "previous-turn") popup.innerHTML = "Tour pr?c?dent";
+		if (e.target.id == "previous-player") popup.innerHTML = "Joueur pr?c?dent";
 		if (e.target.id == "next-turn") popup.innerHTML = "Tour suivant";
 		if (e.target.id == "next-player") popup.innerHTML = "Joueur suivant";
 	});
