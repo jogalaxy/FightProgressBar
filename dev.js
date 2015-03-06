@@ -3,23 +3,15 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.15
+// @version      0.9.0
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
 // @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.min.js
 // @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.layout.min.js
 // @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.js
-// @resource	 rickshaw_css https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.css
-// @grant        GM_addStyle
-// @grant        GM_getResourceText
-// @grant        GM_getValue
-// @grant        GM_setValue
 // @grant        none
 // ==/UserScript==
-
-var rickshaw_css = GM_getResourceText("rickshaw_css");
-GM_addStyle(rickshaw_css);
 
 var Fightcontainer = (function()
 {
@@ -49,7 +41,6 @@ var Fightcontainer = (function()
 	for (var i = 0; i < game.data.leeks.length; i++)
 	{
 		leeks[game.data.leeks[i].id] = {
-			"id" : game.data.leeks[i].id,
 			"absoluteShield" : 0,
 			"relativeShield" : 0,
 			"active" : (game.data.leeks[i].type == 0)?true:false,
@@ -135,7 +126,7 @@ var Fightcontainer = (function()
 				break;
 
 			case ACTION_USE_CHIP:
-				if (action[4] == 0) // Pas d'?chec
+				if (action[4] == 0) // Pas d'échec
 				{
 					if (action[3] == 39) // Inversion
 					{
@@ -145,7 +136,7 @@ var Fightcontainer = (function()
 							leeks[action[1]].cell = action[2];
 						}
 					}
-					if (action[3] == 37) // T?l?portation
+					if (action[3] == 37) // Téléportation
 					{
 						leeks[action[1]].cell = action[2];
 					}
@@ -182,7 +173,7 @@ var Fightcontainer = (function()
 
 		}
 
-		// On sauvegarde l'?tat apr?s l'action
+		// On sauvegarde l'état après l'action
 
 		actionStatus[key] = {
 			"type" : type,
@@ -200,7 +191,7 @@ var Fightcontainer = (function()
 		return JSON.parse(JSON.stringify(obj));
 	}
 
-	// Fonction pour aller de nouveau ? une action pr?cise
+	// Fonction pour aller de nouveau à une action précise
 
 	function goToAction(action)
 	{
@@ -267,7 +258,7 @@ var Fightcontainer = (function()
 
 			if (game.leeks[i].dead)
 			{
-				if (game.leeks[i].drawID)
+				if (game.leeks[i].drawID !== undefined)
 				{
 					if (game.leeks[i].summon) game.hud.removeEntityBlock(game.leeks[i]);
 					game.removeDrawableElement(game.leeks[i].drawID, game.leeks[i].y);
@@ -286,6 +277,8 @@ var Fightcontainer = (function()
 
 			game.leeks[i].moveDelay = 0;
 			game.leeks[i].path = [];
+
+			game.leeks[i].draw();
 		}
 
 		game.showCellTime = 0;
@@ -300,7 +293,7 @@ var Fightcontainer = (function()
 		game.draw();
 	}
 
-	function goToActionFromTurnAndPlayer(turn, playerName)
+	function goToActionFromTurnAndPlayerName(turn, playerName)
 	{
 		var startTurn = 0;
 		for (var i = 0; i < actionStatus.length; i++)
@@ -329,105 +322,6 @@ var Fightcontainer = (function()
 	var hud = document.getElementById("hud");
 	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
-<<<<<<< HEAD
-=======
-	var graphContainer = document.createElement("DIV");
-	
-	var series = [];
-	var data = [];
-	var colors = ["#FF0000", "#0000FF", "#FF2222", "#2222FF", "#FF4444", "#4444FF", "#F6666", "#6666FF", "#FF8888", "#8888FF", "#FFAAAA", "#AAAAFF"];
-	for (var i = 0; i < game.leeks.length; i++)
-	{
-		if (!game.leeks[i].summon)
-		{
-			data = [];
-			var thisTurn = 0;
-			$.each(actionStatus, function(key, action)
-			{
-				if (action.currentTurn != thisTurn)
-				{
-					//data.push({x: action.currentTurn, y: action.leeks[i].life});
-					data.push({x: key + action.currentTurn / 1000, y: action.leeks[i].life});
-					thisTurn = action.currentTurn;
-				}
-				if (key == actionStatus.length - 1)
-				{
-					//data.push({x: action.currentTurn + 0.9, y: action.leeks[i].life});
-					data.push({x: key, y: action.leeks[i].life});
-				}
-			});
-			series.push({name: game.leeks[i].name, color: colors[i], data: data});
-		}
-	}
-	
-	var graph = new Rickshaw.Graph({
-		element: graphContainer,
-		width: parseInt(document.getElementById("fight-info").offsetWidth),
-		renderer: "line",
-		series: series
-	});
-
-	graph.render();
-
-	var hoverDetail = new Rickshaw.Graph.HoverDetail({
-		graph: graph,
-		xFormatter: function(x) { return (actionStatus.length-1 == x) ? "Fin" : "Tour " + Math.round((x - Math.floor(x))*1000) },
-		yFormatter: function(y) { return y + " pv" }
-	});
-	
-	$(graphContainer).click(function()
-	{
-		var turn = $(".rickshaw_graph .detail div.x_label").text();
-		var player = $(".rickshaw_graph .detail div.item.active").text();
-		turn = turn.split(" ");
-		player = player.split(":");
-		if (turn[1] !== undefined && player[1] !== undefined) {
-			playerName = player[0];
-			turn = turn[1];
-			goToActionFromTurnAndPlayer(turn, playerName);
-		}
-	});
-	
-	$(graphContainer).mousemove(function(e)
-	{
-		e.preventDefault();
-		var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
-		percentage = Math.max(Math.min(percentage, 1), 0);
-        var action = Math.round(percentage * game.actions.length);
-
-		popup.innerHTML = "Tour " + actionStatus[action].currentTurn + "<br/>Action " + action;
-		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
-		popup.style.top = (e.clientY - popup.offsetHeight - 5) + "px";
-
-		if(isMouseDown == 1)
-		{
-			goToAction(action);
-			refreshHud();
-		}
-	});
-	
-	$(graphContainer).mousedown(function(e)
-	{
-		e.preventDefault();
-		isMouseDown = true;
-		var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
-		percentage = Math.max(Math.min(percentage, 1), 0);
-		goToAction(Math.round(percentage * game.actions.length));
-		refreshHud();
-		game.pause();
-	});
-	
-	$(graphContainer).mouseup(function(e)
-	{
-		var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
-		percentage = Math.max(Math.min(percentage, 1), 0);
-		goToAction(Math.round(percentage * game.actions.length));
-		refreshHud();
-		game.resume();
-	});
-	
-	graphContainer.style.position = "relative";
->>>>>>> 7b1ffbe9d42e643141e978b5839818fff28d84cb
 	
 	popup.style.position = "fixed";
 	popup.style.display = "none";
@@ -553,8 +447,8 @@ var Fightcontainer = (function()
 		e.preventDefault();
 		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
 		popup.style.top = (e.clientY + popup.offsetHeight - 5) + "px";
-		if (e.target.id == "previous-turn") popup.innerHTML = "Tour pr?c?dent";
-		if (e.target.id == "previous-player") popup.innerHTML = "Joueur pr?c?dent";
+		if (e.target.id == "previous-turn") popup.innerHTML = "Tour précédent";
+		if (e.target.id == "previous-player") popup.innerHTML = "Joueur précédent";
 		if (e.target.id == "next-turn") popup.innerHTML = "Tour suivant";
 		if (e.target.id == "next-player") popup.innerHTML = "Joueur suivant";
 	});
@@ -640,10 +534,11 @@ var Fightcontainer = (function()
 	{
 
 		var graphContainer = document.createElement("DIV");
-		
+		graphContainer.style.height = "250px";
+
 		var series = [];
 		var data = [];
-		var colors = ["#FF0000", "#0000FF", "#FF2222", "#2222FF", "#FF4444", "#4444FF", "#F6666", "#6666FF", "#FF8888", "#8888FF", "#FFAAAA", "#AAAAFF"];
+		var colors = ["#FFFFFF", "#FF0000", "#0000FF"];
 		for (var i = 0; i < game.leeks.length; i++)
 		{
 			if (!game.leeks[i].summon)
@@ -654,17 +549,15 @@ var Fightcontainer = (function()
 				{
 					if (action.currentTurn != thisTurn)
 					{
-						//data.push({x: action.currentTurn, y: action.leeks[i].life});
 						data.push({x: key + action.currentTurn / 1000, y: action.leeks[i].life});
 						thisTurn = action.currentTurn;
 					}
 					if (key == actionStatus.length - 1)
 					{
-						//data.push({x: action.currentTurn + 0.9, y: action.leeks[i].life});
 						data.push({x: key, y: action.leeks[i].life});
 					}
 				});
-				series.push({name: game.leeks[i].name, color: colors[i], data: data});
+				series.push({name: game.leeks[i].name, color: colors[game.leeks[i].team], data: data});
 			}
 		}
 		
@@ -682,23 +575,65 @@ var Fightcontainer = (function()
 			xFormatter: function(x) { return (actionStatus.length-1 == x) ? "Fin" : "Tour " + Math.round((x - Math.floor(x))*1000) },
 			yFormatter: function(y) { return y + " pv" }
 		});
-		
-		$(graphContainer).click(function()
+
+		$(graphContainer).mousemove(function(e)
 		{
-			var turn = $(".rickshaw_graph .detail div.x_label").text();
-			var player = $(".rickshaw_graph .detail div.item.active").text();
-			turn = turn.split(" ");
-			player = player.split(":");
-			if (turn[1] !== undefined && player[1] !== undefined) {
-				playerName = player[0];
-				turn = turn[1];
-				goToActionFromTurnAndPlayer(turn, playerName);
+			e.preventDefault();
+			var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+			percentage = Math.max(Math.min(percentage, 1), 0);
+			var action = Math.round(percentage * game.actions.length);
+
+			popup.innerHTML = $('#fight-info .detail .x_label').text() + "<br/> " + $('#fight-info .detail .item').text();
+			popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
+			popup.style.top = (e.clientY - popup.offsetHeight - 5) + "px";
+
+			if(isMouseDown == 1)
+			{
+				goToAction(action);
+				refreshHud();
 			}
 		});
 		
+		$(graphContainer).mousedown(function(e)
+		{
+			e.preventDefault();
+			isMouseDown = true;
+			var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+			percentage = Math.max(Math.min(percentage, 1), 0);
+			goToAction(Math.round(percentage * game.actions.length));
+			refreshHud();
+			game.pause();
+		});
+		
+		$(graphContainer).mouseup(function(e)
+		{
+			e.preventDefault();
+			isMouseDown = false;
+			var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+			percentage = Math.max(Math.min(percentage, 1), 0);
+			goToAction(Math.round(percentage * game.actions.length));
+			refreshHud();
+			game.resume();
+		});
+
+		$(graphContainer).mouseenter(function()
+		{
+			popup.style.display = "block";
+		});
+
+		$(graphContainer).mouseleave(function()
+		{
+			popup.style.display = "none";
+		});
+
 		graphContainer.style.position = "relative";
 
 		$("#fight-info").prepend(graphContainer);
+		$("#fight-info").css({
+			position: "relative",
+			backgroundColor: "#fff",
+			zIndex: 998,
+		});
 
 		graphProgress = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
 		graphProgress.setAttributeNS(null, 'x', 0);
@@ -709,18 +644,21 @@ var Fightcontainer = (function()
 		graphProgress.setAttributeNS(null, 'fill-opacity', 0.5);
 		graphContainer.children[0].appendChild(graphProgress);
 
+		$('#fight-info .detail').css("display", "none");
+
 	}
 
 	// Configuration graphique
-	var Config_loadGraph = GM_getValue('Config_loadGraph', true);
-	if (Config_loadGraph)
+	var Config_loadGraph = getValue('Config_loadGraph', "1");
+	console.log(Config_loadGraph);
+	if (Config_loadGraph == "1")
 	{
 		loadGraph();
-		$('#fight-info').prepend('<center><a href="#" id="toggleGraph">Cacher le graphique</a></center>');
+		$('#fight-info').append('<div style="background: #222; text-align: center;"><a href="#" id="toggleGraph" style="color: #FFF;">Cacher le graphique</a></div>');
 	}
 	else
 	{
-		$('#fight-info').prepend('<center><a href="#" id="toggleGraph">Afficher le graphique</a></center>');
+		$('#fight-info').append('<div style="background: #222; text-align: center;"><a href="#" id="toggleGraph" style="color: #FFF;">Afficher le graphique</a></div>');
 	}
 
 	$('#toggleGraph').click(function(e)
@@ -729,12 +667,12 @@ var Fightcontainer = (function()
 		if ($(this).text() == "Cacher le graphique")
 		{
 			$(this).text("Afficher le graphique");
-			GM_setValue('Config_loadGraph', false);
+			setValue('Config_loadGraph', "0");
 		}
 		else
 		{
 			$(this).text("Cacher le graphique");
-			GM_setValue('Config_loadGraph', true);
+			setValue('Config_loadGraph', "1");
 		}
 	});
 
@@ -766,3 +704,15 @@ var intervalFightcontainer = setInterval(function()
 		Fightcontainer();
 	}
 }, 100);
+
+// Local Storage
+
+function setValue(aKey, aVal) {
+	localStorage.setItem(aKey, aVal);
+}
+
+function getValue(aKey, aDefault) {
+	var val = localStorage.getItem(aKey);
+	if (null === val && 'undefined' != typeof aDefault) return aDefault;
+	return val;
+}
