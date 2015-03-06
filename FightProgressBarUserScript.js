@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.9.2
+// @version      0.9.3
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -513,10 +513,10 @@ var Fightcontainer = (function()
 		e.preventDefault();
 		popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
 		popup.style.top = (e.clientY + popup.offsetHeight - 5) + "px";
-		if (e.target.id == "previous-turn") popup.innerHTML = "Tour précédent";
-		if (e.target.id == "previous-player") popup.innerHTML = "Joueur précédent";
-		if (e.target.id == "next-turn") popup.innerHTML = "Tour suivant";
-		if (e.target.id == "next-player") popup.innerHTML = "Joueur suivant";
+		if (e.target.id == "previous-turn") popup.innerHTML = "Tour précédent (c)";
+		if (e.target.id == "previous-player") popup.innerHTML = "Joueur précédent (v)";
+		if (e.target.id == "next-turn") popup.innerHTML = "Tour suivant (n)";
+		if (e.target.id == "next-player") popup.innerHTML = "Joueur suivant (b)";
 	});
 
 	$('#previous-turn').click(goToPreviousTurn);
