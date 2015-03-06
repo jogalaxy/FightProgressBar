@@ -13,6 +13,8 @@
 // @resource	 rickshaw_css https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
+// @grant        GM_getValue
+// @grant        GM_setValue
 // @grant        none
 // ==/UserScript==
 
@@ -327,64 +329,6 @@ var Fightcontainer = (function()
 	var hud = document.getElementById("hud");
 	var container = document.createElement("DIV");
 	var progressBar = document.createElement("DIV");
-	var graphContainer = document.createElement("DIV");
-	
-	var series = [];
-	var data = [];
-	var colors = ["#FF0000", "#0000FF", "#FF2222", "#2222FF", "#FF4444", "#4444FF", "#F6666", "#6666FF", "#FF8888", "#8888FF", "#FFAAAA", "#AAAAFF"];
-	for (var i = 0; i < game.leeks.length; i++)
-	{
-		if (!game.leeks[i].summon)
-		{
-			data = [];
-			var thisTurn = 0;
-			$.each(actionStatus, function(key, action)
-			{
-				if (action.currentTurn != thisTurn)
-				{
-					//data.push({x: action.currentTurn, y: action.leeks[i].life});
-					data.push({x: key + action.currentTurn / 1000, y: action.leeks[i].life});
-					thisTurn = action.currentTurn;
-				}
-				if (key == actionStatus.length - 1)
-				{
-					//data.push({x: action.currentTurn + 0.9, y: action.leeks[i].life});
-					data.push({x: key, y: action.leeks[i].life});
-				}
-			});
-			series.push({name: game.leeks[i].name, color: colors[i], data: data});
-		}
-	}
-	
-	var graph = new Rickshaw.Graph({
-		element: graphContainer,
-		width: parseInt(document.getElementById("fight-info").offsetWidth),
-		renderer: "line",
-		series: series
-	});
-
-	graph.render();
-
-	var hoverDetail = new Rickshaw.Graph.HoverDetail({
-		graph: graph,
-		xFormatter: function(x) { return (actionStatus.length-1 == x) ? "Fin" : "Tour " + Math.round((x - Math.floor(x))*1000) },
-		yFormatter: function(y) { return y + " pv" }
-	});
-	
-	$(graphContainer).click(function()
-	{
-		var turn = $(".rickshaw_graph .detail div.x_label").text();
-		var player = $(".rickshaw_graph .detail div.item.active").text();
-		turn = turn.split(" ");
-		player = player.split(":");
-		if (turn[1] !== undefined && player[1] !== undefined) {
-			playerName = player[0];
-			turn = turn[1];
-			goToActionFromTurnAndPlayer(turn, playerName);
-		}
-	});
-	
-	graphContainer.style.position = "relative";
 	
 	popup.style.position = "fixed";
 	popup.style.display = "none";
@@ -413,16 +357,6 @@ var Fightcontainer = (function()
 	container.appendChild(progressBar);
 	$(hud).prepend(container);
 	$(hud).prepend(popup);
-	$("#fight-info").prepend(graphContainer);
-
-	var graphProgress = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-	graphProgress.setAttributeNS(null, 'x', 0);
-	graphProgress.setAttributeNS(null, 'y', 0);
-	graphProgress.setAttributeNS(null, 'height', '100%');
-	graphProgress.setAttributeNS(null, 'width', '0');
-	graphProgress.setAttributeNS(null, 'fill', '#000000');
-	graphProgress.setAttributeNS(null, 'fill-opacity', 0.5);
-	graphContainer.children[0].appendChild(graphProgress);
 
 	var isMouseDown = false;
 
@@ -596,8 +530,114 @@ var Fightcontainer = (function()
 	{
 		var percent = game.currentAction/game.actions.length * 100;
 		progressBar.style.width = percent + "%";
-		graphProgress.setAttributeNS(null, 'width', percent + "%");
+		if (graphProgress !== undefined) graphProgress.setAttributeNS(null, 'width', percent + "%");
 	}
+
+	var graphProgress = undefined;
+
+	// Graphique
+
+	function loadGraph()
+	{
+
+		var graphContainer = document.createElement("DIV");
+		
+		var series = [];
+		var data = [];
+		var colors = ["#FF0000", "#0000FF", "#FF2222", "#2222FF", "#FF4444", "#4444FF", "#F6666", "#6666FF", "#FF8888", "#8888FF", "#FFAAAA", "#AAAAFF"];
+		for (var i = 0; i < game.leeks.length; i++)
+		{
+			if (!game.leeks[i].summon)
+			{
+				data = [];
+				var thisTurn = 0;
+				$.each(actionStatus, function(key, action)
+				{
+					if (action.currentTurn != thisTurn)
+					{
+						//data.push({x: action.currentTurn, y: action.leeks[i].life});
+						data.push({x: key + action.currentTurn / 1000, y: action.leeks[i].life});
+						thisTurn = action.currentTurn;
+					}
+					if (key == actionStatus.length - 1)
+					{
+						//data.push({x: action.currentTurn + 0.9, y: action.leeks[i].life});
+						data.push({x: key, y: action.leeks[i].life});
+					}
+				});
+				series.push({name: game.leeks[i].name, color: colors[i], data: data});
+			}
+		}
+		
+		var graph = new Rickshaw.Graph({
+			element: graphContainer,
+			width: parseInt(document.getElementById("fight-info").offsetWidth),
+			renderer: "line",
+			series: series
+		});
+
+		graph.render();
+
+		var hoverDetail = new Rickshaw.Graph.HoverDetail({
+			graph: graph,
+			xFormatter: function(x) { return (actionStatus.length-1 == x) ? "Fin" : "Tour " + Math.round((x - Math.floor(x))*1000) },
+			yFormatter: function(y) { return y + " pv" }
+		});
+		
+		$(graphContainer).click(function()
+		{
+			var turn = $(".rickshaw_graph .detail div.x_label").text();
+			var player = $(".rickshaw_graph .detail div.item.active").text();
+			turn = turn.split(" ");
+			player = player.split(":");
+			if (turn[1] !== undefined && player[1] !== undefined) {
+				playerName = player[0];
+				turn = turn[1];
+				goToActionFromTurnAndPlayer(turn, playerName);
+			}
+		});
+		
+		graphContainer.style.position = "relative";
+
+		$("#fight-info").prepend(graphContainer);
+
+		graphProgress = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+		graphProgress.setAttributeNS(null, 'x', 0);
+		graphProgress.setAttributeNS(null, 'y', 0);
+		graphProgress.setAttributeNS(null, 'height', '100%');
+		graphProgress.setAttributeNS(null, 'width', '0');
+		graphProgress.setAttributeNS(null, 'fill', '#000000');
+		graphProgress.setAttributeNS(null, 'fill-opacity', 0.5);
+		graphContainer.children[0].appendChild(graphProgress);
+
+	}
+
+	// Configuration graphique
+	var Config_loadGraph = GM_getValue('Config_loadGraph', true);
+	if (Config_loadGraph)
+	{
+		loadGraph();
+		$('#fight-info').prepend('<center><a href="#" id="toggleGraph">Cacher le graphique</a></center>');
+	}
+	else
+	{
+		$('#fight-info').prepend('<center><a href="#" id="toggleGraph">Afficher le graphique</a></center>');
+	}
+
+	$('#toggleGraph').click(function(e)
+	{
+		e.preventDefault();
+		if ($(this).text() == "Cacher le graphique")
+		{
+			$(this).text("Afficher le graphique");
+			GM_setValue('Config_loadGraph', false);
+		}
+		else
+		{
+			$(this).text("Cacher le graphique");
+			GM_setValue('Config_loadGraph', true);
+		}
+	});
 
 	// Onload
 	var intervalInitialized = setInterval(function()
