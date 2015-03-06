@@ -3,10 +3,13 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.8.14
+// @version      0.9.0
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
+// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.min.js
+// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/vendor/d3.layout.min.js
+// @require      https://raw.githubusercontent.com/shutterstock/rickshaw/master/rickshaw.min.js
 // @grant        none
 // ==/UserScript==
 
@@ -290,6 +293,29 @@ var Fightcontainer = (function()
 		game.draw();
 	}
 
+	function goToActionFromTurnAndPlayerName(turn, playerName)
+	{
+		var startTurn = 0;
+		for (var i = 0; i < actionStatus.length; i++)
+		{
+			if (actionStatus[i].currentTurn == turn && startTurn == 0)
+				startTurn = i;
+			/*if (actionStatus[i].currentTurn == turn && game.leeks[actionStatus[i].currentPlayer].name == playerName)
+			{
+				startTurn = i-1;
+				break;
+			}*/
+		}
+		if (startTurn != 0)
+		{
+			goToAction(startTurn);
+			$("#actions .action").remove();
+			$("#logs .log").remove();
+			$("[id^=effect]").remove();
+		}
+		refreshHud();
+	}
+
 	// Interface
     
 	var popup = document.createElement("DIV");
@@ -334,7 +360,7 @@ var Fightcontainer = (function()
 		var percentage = ((e.clientX - $(container).offset().left)/container.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
-		progressBar.style.width = (percentage * 100) + "%";
+		refreshHud();
 		game.pause();
 	});
 
@@ -348,7 +374,7 @@ var Fightcontainer = (function()
 		var percentage = ((e.clientX - $(container).offset().left)/container.offsetWidth);
 		percentage = Math.max(Math.min(percentage, 1), 0);
 		goToAction(Math.round(percentage * game.actions.length));
-		progressBar.style.width = (percentage * 100) + "%";
+		refreshHud();
 		game.resume();
 	});
 
@@ -366,7 +392,7 @@ var Fightcontainer = (function()
 		if(isMouseDown == 1)
 		{
 			goToAction(action);
-			progressBar.style.width = (percentage * 100) + "%";
+			refreshHud();
 		}
 	});
 
@@ -495,8 +521,160 @@ var Fightcontainer = (function()
 
 	function refreshHud()
 	{
-		progressBar.style.width = (game.currentAction/game.actions.length * 100) + "%";
+		var percent = game.currentAction/game.actions.length * 100;
+		progressBar.style.width = percent + "%";
+		if (graphProgress !== undefined) graphProgress.setAttributeNS(null, 'width', percent + "%");
 	}
+
+	var graphProgress = undefined;
+
+	// Graphique
+
+	function loadGraph()
+	{
+
+		var graphContainer = document.createElement("DIV");
+		graphContainer.style.height = "250px";
+
+		var series = [];
+		var data = [];
+		var colors = ["#FFFFFF", "#FF0000", "#0000FF"];
+		for (var i = 0; i < game.leeks.length; i++)
+		{
+			if (!game.leeks[i].summon)
+			{
+				data = [];
+				var thisTurn = 0;
+				$.each(actionStatus, function(key, action)
+				{
+					if (action.currentTurn != thisTurn)
+					{
+						data.push({x: key + action.currentTurn / 1000, y: action.leeks[i].life});
+						thisTurn = action.currentTurn;
+					}
+					if (key == actionStatus.length - 1)
+					{
+						data.push({x: key, y: action.leeks[i].life});
+					}
+				});
+				series.push({name: game.leeks[i].name, color: colors[game.leeks[i].team], data: data});
+			}
+		}
+		
+		var graph = new Rickshaw.Graph({
+			element: graphContainer,
+			width: parseInt(document.getElementById("fight-info").offsetWidth),
+			renderer: "line",
+			series: series
+		});
+
+		graph.render();
+
+		var hoverDetail = new Rickshaw.Graph.HoverDetail({
+			graph: graph,
+			xFormatter: function(x) { return (actionStatus.length-1 == x) ? "Fin" : "Tour " + Math.round((x - Math.floor(x))*1000) },
+			yFormatter: function(y) { return y + " pv" }
+		});
+
+		$(graphContainer).mousemove(function(e)
+		{
+			e.preventDefault();
+			var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+			percentage = Math.max(Math.min(percentage, 1), 0);
+			var action = Math.round(percentage * game.actions.length);
+
+			popup.innerHTML = $('#fight-info .detail .x_label').text() + "<br/> " + $('#fight-info .detail .item').text();
+			popup.style.left = (e.clientX - popup.offsetWidth / 2) + "px";
+			popup.style.top = (e.clientY - popup.offsetHeight - 5) + "px";
+
+			if(isMouseDown == 1)
+			{
+				goToAction(action);
+				refreshHud();
+			}
+		});
+		
+		$(graphContainer).mousedown(function(e)
+		{
+			e.preventDefault();
+			isMouseDown = true;
+			var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+			percentage = Math.max(Math.min(percentage, 1), 0);
+			goToAction(Math.round(percentage * game.actions.length));
+			refreshHud();
+			game.pause();
+		});
+		
+		$(graphContainer).mouseup(function(e)
+		{
+			e.preventDefault();
+			isMouseDown = false;
+			var percentage = ((e.clientX - $(graphContainer).offset().left)/graphContainer.offsetWidth);
+			percentage = Math.max(Math.min(percentage, 1), 0);
+			goToAction(Math.round(percentage * game.actions.length));
+			refreshHud();
+			game.resume();
+		});
+
+		$(graphContainer).mouseenter(function()
+		{
+			popup.style.display = "block";
+		});
+
+		$(graphContainer).mouseleave(function()
+		{
+			popup.style.display = "none";
+		});
+
+		graphContainer.style.position = "relative";
+
+		$("#fight-info").prepend(graphContainer);
+		$("#fight-info").css({
+			position: "relative",
+			backgroundColor: "#fff",
+			zIndex: 998,
+		});
+
+		graphProgress = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+		graphProgress.setAttributeNS(null, 'x', 0);
+		graphProgress.setAttributeNS(null, 'y', 0);
+		graphProgress.setAttributeNS(null, 'height', '100%');
+		graphProgress.setAttributeNS(null, 'width', '0');
+		graphProgress.setAttributeNS(null, 'fill', '#000000');
+		graphProgress.setAttributeNS(null, 'fill-opacity', 0.5);
+		graphContainer.children[0].appendChild(graphProgress);
+
+		$('#fight-info .detail').css("display", "none");
+
+	}
+
+	// Configuration graphique
+	var Config_loadGraph = getValue('Config_loadGraph', "1");
+	console.log(Config_loadGraph);
+	if (Config_loadGraph == "1")
+	{
+		loadGraph();
+		$('#fight-info').append('<div style="background: #222; text-align: center;"><a href="#" id="toggleGraph" style="color: #FFF;">Cacher le graphique</a></div>');
+	}
+	else
+	{
+		$('#fight-info').append('<div style="background: #222; text-align: center;"><a href="#" id="toggleGraph" style="color: #FFF;">Afficher le graphique</a></div>');
+	}
+
+	$('#toggleGraph').click(function(e)
+	{
+		e.preventDefault();
+		if ($(this).text() == "Cacher le graphique")
+		{
+			$(this).text("Afficher le graphique");
+			setValue('Config_loadGraph', "0");
+		}
+		else
+		{
+			$(this).text("Cacher le graphique");
+			setValue('Config_loadGraph', "1");
+		}
+	});
 
 	// Onload
 	var intervalInitialized = setInterval(function()
@@ -509,24 +687,7 @@ var Fightcontainer = (function()
 			{
 				var turn = hash[0];
 				var playerName = hash[1];
-				var startTurn = 0;
-				for (var i = 0; i < actionStatus.length; i++)
-				{
-					if (actionStatus[i].currentTurn == turn && startTurn == 0)
-						startTurn = i;
-					/*if (actionStatus[i].currentTurn == turn && game.leeks[actionStatus[i].currentPlayer].name == playerName)
-					{
-						startTurn = i-1;
-						break;
-					}*/
-				}
-				if (startTurn != 0)
-				{
-					goToAction(startTurn);
-					$("#actions .action").remove();
-					$("#logs .log").remove();
-					$("[id^=effect]").remove();
-				}
+				goToActionFromTurnAndPlayerName(turn, playerName);
 			}
 		}
 	}, 100);
@@ -543,3 +704,15 @@ var intervalFightcontainer = setInterval(function()
 		Fightcontainer();
 	}
 }, 100);
+
+// Local Storage
+
+function setValue(aKey, aVal) {
+	localStorage.setItem(aKey, aVal);
+}
+
+function getValue(aKey, aDefault) {
+	var val = localStorage.getItem(aKey);
+	if (null === val && 'undefined' != typeof aDefault) return aDefault;
+	return val;
+}
