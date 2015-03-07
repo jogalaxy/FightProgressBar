@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.9.3
+// @version      0.9.4
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -195,6 +195,8 @@ var Fightcontainer = (function()
 
 	function goToAction(action)
 	{
+		showPlayerName(action);
+
 		$("#actions .action").remove();
 		$("#logs .log").remove();
 		$("[id^=effect]").remove();
@@ -291,6 +293,22 @@ var Fightcontainer = (function()
 		$('#turn').text("");
 		game.hud.refresh();
 		game.draw();
+
+	}
+
+	function showPlayerName(action)
+	{
+
+		var actionForName = action;
+		if (actionStatus[action].type == ACTION_NEW_TURN)
+		{
+			// si le type est ACTION_NEW_TURN, le nom du joueur dans le tableau d'actions est encore celui du tour précédent.
+			// incrémente de 1 pour avoir le bon nom
+			actionForName++;
+		}
+		var leek = game.leeks[actionStatus[actionForName].currentPlayer];
+		$('#player-name').css('color', teamColors[leek.team]);
+		$('#player-name').html(leek.name);
 	}
 
 	function goToActionFromTurnAndPlayerName(turn, playerName)
@@ -384,6 +402,7 @@ var Fightcontainer = (function()
 
 	// Interface
 
+	var teamColors = ["#FFFFFF", "#0000FF", "#FF0000"];
 	var popup = document.createElement("DIV");
 	var hud = document.getElementById("hud");
 	var container = document.createElement("DIV");
@@ -497,6 +516,7 @@ var Fightcontainer = (function()
 	$('#top-part').prepend('<img class="top-part-action" id="previous-turn" src="http://leekwars.com/static/image/icon_speed.png" style="transform: rotate(180deg); width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part').append('<img class="top-part-action" id="next-player" src="http://leekwars.com/static/image/icon_play.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part').append('<img class="top-part-action" id="next-turn" src="http://leekwars.com/static/image/icon_speed.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
+	$('#top-part-wrapper').append($('<div/>').attr('id', 'player-name').css('color', $('#turn').css('color')));
 
 	$('.top-part-action').mouseenter(function()
 	{
@@ -559,6 +579,12 @@ var Fightcontainer = (function()
 		var percent = game.currentAction/game.actions.length * 100;
 		progressBar.style.width = percent + "%";
 		if (graphProgress !== undefined) graphProgress.setAttributeNS(null, 'width', percent + "%");
+
+		// affiche le nom du joueur pour l'action suivante
+		if ((game.currentAction + 1) < actionStatus.length)
+		{
+			showPlayerName(game.currentAction + 1);
+		}
 	}
 
 	var graphProgress = undefined;
@@ -573,7 +599,6 @@ var Fightcontainer = (function()
 
 		var series = [];
 		var data = [];
-		var colors = ["#FFFFFF", "#0000FF", "#FF0000"];
 		for (var i = 0; i < game.leeks.length; i++)
 		{
 			if (!game.leeks[i].summon)
@@ -592,7 +617,7 @@ var Fightcontainer = (function()
 						data.push({x: key, y: action.leeks[i].life});
 					}
 				});
-				series.push({name: game.leeks[i].name, color: colors[game.leeks[i].team], data: data});
+				series.push({name: game.leeks[i].name, color: teamColors[game.leeks[i].team], data: data});
 			}
 		}
 
