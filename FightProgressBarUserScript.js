@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.9.5
+// @version      0.9.6
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -517,6 +517,9 @@ var Fightcontainer = (function()
 	$('#top-part').append('<img class="top-part-action" id="next-player" src="http://leekwars.com/static/image/icon_play.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part').append('<img class="top-part-action" id="next-turn" src="http://leekwars.com/static/image/icon_speed.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part-wrapper').append($('<div/>').attr('id', 'player-name').css('color', $('#turn').css('color')));
+
+	document.head.insertAdjacentHTML('beforeEnd', '<style>#top-part:before{right: -45px;border-bottom: 45px solid transparent;border-left: 45px solid #D1D1D1;}</style>');
+	document.head.insertAdjacentHTML('beforeEnd', '<style>#top-part:after{left: -45px;border-bottom: 45px solid transparent;border-right: 45px solid #D1D1D1;}</style>');
 
 	$('.top-part-action').mouseenter(function()
 	{
