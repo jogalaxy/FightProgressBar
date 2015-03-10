@@ -519,8 +519,8 @@ var Fightcontainer = (function()
 		$('#top-part-wrapper').css('top', -8);
 	}
 
-	$('#top-part-wrapper').css('margin-left', -100);
-	$('#top-part-wrapper').css('width', 200);
+	$('#top-part-wrapper').css('margin-left', -150);
+	$('#top-part-wrapper').css('width', 300);
 	$('#top-part').prepend('<img class="top-part-action" id="previous-player" src="http://leekwars.com/static/image/icon_play.png" style="transform: rotate(180deg); width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part').prepend('<img class="top-part-action" id="previous-turn" src="http://leekwars.com/static/image/icon_speed.png" style="transform: rotate(180deg); width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
 	$('#top-part').append('<img class="top-part-action" id="next-player" src="http://leekwars.com/static/image/icon_play.png" style="width: 16px; margin: 0 8px; opacity: 0.6; cursor: pointer;">');
