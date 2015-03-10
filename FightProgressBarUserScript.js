@@ -3,7 +3,7 @@
 // @namespace    Fightcontainer
 // @downloadURL  https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
 // @updateURL    https://raw.githubusercontent.com/jogalaxy/FightProgressBar/master/FightProgressBarUserScript.js
-// @version      0.9.7
+// @version      0.9.8
 // @description  This plugin adds an awesome progress bar to the fight viewer.
 // @author       jojo123 and Charlesfire
 // @match        http://leekwars.com/fight/*
@@ -146,6 +146,7 @@ var Fightcontainer = (function()
 			case ACTION_SUMMONING:
 				leeks[action[2]].active = true;
 				leeks[action[2]].cell = action[3];
+				game.leeks[action[2]].parentLeekID = action[1];
 				break;
 
 			case ACTION_ADD_WEAPON_EFFECT:
@@ -169,6 +170,7 @@ var Fightcontainer = (function()
 				leeks[action[2]].life = action[4];
 				leeks[action[2]].maxLife = action[5];
 				leeks[action[2]].active = true;
+				game.leeks[action[2]].parentLeekID = action[1];
 				break;
 
 		}
@@ -308,7 +310,14 @@ var Fightcontainer = (function()
 		}
 		var leek = game.leeks[actionStatus[actionForName].currentPlayer];
 		$('#player-name').css('color', teamColors[leek.team]);
-		$('#player-name').html(leek.name);
+		if (leek.summon)
+		{
+			$('#player-name').html(leek.name + ' (' + game.leeks[leek.parentLeekID].name + ')');
+		}
+		else
+		{
+			$('#player-name').html(leek.name);
+		}
 	}
 
 	function goToActionFromTurnAndPlayerName(turn, playerName)
